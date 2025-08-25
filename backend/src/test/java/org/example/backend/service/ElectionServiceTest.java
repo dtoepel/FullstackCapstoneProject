@@ -1,10 +1,8 @@
 package org.example.backend.service;
 
 import org.example.backend.model.db.Election;
-import org.example.backend.model.db.Vote;
 import org.example.backend.repository.ElectionRepo;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.util.Vector;
