@@ -14,8 +14,6 @@ public class ElectionService {
         this.electionRepo = electionRepo;
     }
 
-    public List<Election> getAllElections() {
-        System.out.println("service");
-    return electionRepo.findAll(); }
+    public List<Election> getAllElections() { return electionRepo.findAll(); }
 
 }

@@ -16,8 +16,5 @@ public class ElectionController {
     }
 
     @GetMapping
-    public List<Election> getAllElections() {
-
-        System.out.println("controller");
-        return electionService.getAllElections(); }
+    public List<Election> getAllElections() { return electionService.getAllElections(); }
 }
