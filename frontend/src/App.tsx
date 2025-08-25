@@ -1,33 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import {Link, Route, Routes} from "react-router-dom";
+import {useEffect, useState} from "react";
+import type {Election} from "./ElectionData.ts";
+import ElectionTable from "./ElectionTable.tsx";
+import axios from "axios";
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
+    // main model
+    const [elections, setElections] = useState<Election[]>([]);
+
+    // only place to update data
+    // could be split to reduce traffic by a small amount
+    function getAllElectionsAndCandidates():void {
+        axios.get("/api/election").then(
+            (response) => {
+                setElections(response.data);
+                /*axios.get("/api/election/candidates").then(
+                    (response) => {
+                        setCandidates(response.data);
+                    }
+                )*/
+            }
+        )
+    }
+
+    useEffect(() => {
+        getAllElectionsAndCandidates()
+    },[])
+
+
+    return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+        <h1>Election Manager</h1>
+        <Routes>
+            <Route path={"/"} element={<ElectionTable value={elections} />}/>
+        </Routes>
+        <br/>
+        <hr/>
+        <Link to={"/"}>Main</Link>
+        &nbsp;-&nbsp;
+        ...
+        &nbsp;-&nbsp;
+        ...
     </>
   )
 }
