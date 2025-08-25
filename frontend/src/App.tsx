@@ -32,7 +32,7 @@ function App() {
 
     return (
     <>
-        <h1>Elections</h1>
+        <h1>Election Manager</h1>
         <Routes>
             <Route path={"/"} element={<ElectionTable value={elections} />}/>
         </Routes>
