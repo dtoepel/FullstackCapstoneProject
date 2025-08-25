@@ -10,7 +10,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
             <table border={1}>
                 <thead>
                 <tr>
-                    <th>id</th>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Status</th>
                     <th>Info</th>

@@ -38,7 +38,7 @@ function App() {
         </Routes>
         <br/>
         <hr/>
-        <Link to={"/"}>Main</Link>
+        <Link to={"/"}>Elections</Link>
         &nbsp;-&nbsp;
         ...
         &nbsp;-&nbsp;
