@@ -1,4 +1,4 @@
-name: Warehouse Management Deployment
+name: Election Management Deployment
 
 on:
   push:
