@@ -1,11 +1,19 @@
 import './App.css'
-import {Link, Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import type {Election} from "./ElectionData.ts";
 import ElectionTable from "./ElectionTable.tsx";
 import axios from "axios";
+import NavigationItem from "./NavigationItem.tsx";
+import electionLogo from './assets/election.svg'
+import candidatesLogo from './assets/candidates.svg'
+import archiveLogo from './assets/archive-inv.svg'
+import logoutLogo from './assets/logout.svg'
+import loginLogo from './assets/login.svg'
+import voteLogo from './assets/vote.svg'
 
 function App() {
+    const nav = useNavigate();
 
     // main model
     const [elections, setElections] = useState<Election[]>([]);
@@ -35,7 +43,7 @@ function App() {
     const loadUser = () => {
         axios.get('/api/auth/me')
             .then(response => {
-                console.log(response); setUser(response.data)
+                setUser(response.data===""?null:response.data)
             })
             .catch(() => setUser(null));
     }
@@ -55,20 +63,43 @@ function App() {
     }, []);
 
     return (
-    <>
+    <div style={{display:"flex",
+        flexDirection:"column",
+        justifyContent:"flex-start",
+        alignItems:"center"}}>
+        <div className={"navigation-bar"}>
+            <NavigationItem
+                text={"Elections"}
+                symbolFile={electionLogo}
+                onClick={() => nav("/")}/>
+            <NavigationItem
+                text={"Candidates"}
+                symbolFile={candidatesLogo}
+                onClick={() => nav("/candidates/")}/>
+            <NavigationItem
+                text={"Vote"}
+                symbolFile={voteLogo}
+                onClick={() => nav("/vote/")}/>
+            <NavigationItem
+                text={"Archive"}
+                symbolFile={archiveLogo}
+                onClick={() => nav("/archive/")}/>
+            <NavigationItem
+                text={user?"Logout":"Login"}
+                symbolFile={user?logoutLogo:loginLogo}
+                onClick={user?logout:login}/>
+        </div>
+
         <h1>Election Manager</h1>
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
             <Route path={"/"} element={<ElectionTable value={elections} />}/>
+            <Route path={"/candidates/"} element={"This is the candidate page"}/>
+            <Route path={"/vote/"} element={"This is the vote page"}/>
+            <Route path={"/archive/"} element={"This is the archive page"}/>
+            <Route path={"/result/"} element={"This is the result page"}/>
         </Routes>
-        <br/>
-        <hr/>
-        <Link to={"/"}>Elections</Link>
-        &nbsp;-&nbsp;
-        <button onClick={login}>Login</button>
-        &nbsp;-&nbsp;
-        <button onClick={logout}>Logout</button>
-    </>
+    </div>
   )
 }
 
