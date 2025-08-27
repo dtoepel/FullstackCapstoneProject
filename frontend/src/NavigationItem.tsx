@@ -6,7 +6,7 @@ export type NavigationItemProps = {
 
 export default function NavigationItem(props:Readonly<NavigationItemProps>) {
     return(
-        <div className={"navigation-item"} onClick={props.onClick}>
+        <button className={"navigation-item"} onClick={props.onClick}>
             <img
                 src={props.symbolFile}
                 alt={"Icon for " + props.text}
@@ -16,6 +16,6 @@ export default function NavigationItem(props:Readonly<NavigationItemProps>) {
                 {props.text}
             </p>
             &nbsp;
-        </div>
+        </button>
     )
 }
