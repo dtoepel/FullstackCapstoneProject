@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Vector;
 
 import static org.example.backend.model.count.Candidate.CandidateStatus.*;
 
@@ -25,8 +24,8 @@ public class MeekAlgorithm {
      * @param votes The votes cast
      * @param seats The number of seats to be awarded
      */
-    public MeekAlgorithm(Vector<org.example.backend.model.db.Candidate> candidates,
-                         Vector<org.example.backend.model.db.Vote> votes, int seats)  {
+    public MeekAlgorithm(ArrayList<org.example.backend.model.db.Candidate> candidates,
+                         ArrayList<org.example.backend.model.db.Vote> votes, int seats)  {
         this.candidates = new ArrayList<>();
         this.firstVotes = new HashMap<>();
         for(org.example.backend.model.db.Candidate c : candidates) {
@@ -99,7 +98,7 @@ public class MeekAlgorithm {
 
     private void excludeLast(DetailedResult result) {
         Count count = countVotes();
-        Vector<Candidate> hopefulCandidates = new Vector<>();
+        ArrayList<Candidate> hopefulCandidates = new ArrayList<>();
         for(Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
         hopefulCandidates.sort(new VoteSorter(count));
 
@@ -111,7 +110,7 @@ public class MeekAlgorithm {
     private int electCandidates(DetailedResult result) {
         Count count = countVotes();
         int newlyElected = 0;
-        Vector<Candidate> hopefulCandidates = new Vector<>();
+        ArrayList<Candidate> hopefulCandidates = new ArrayList<>();
         for(Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
         hopefulCandidates.sort(new VoteSorter(count));
 
@@ -189,8 +188,8 @@ public class MeekAlgorithm {
         }
     }
 
-    public Vector<ElectionResultItem> getResult() {
-        Vector<ElectionResultItem> result = new Vector<>();
+    public ArrayList<ElectionResultItem> getResult() {
+        ArrayList<ElectionResultItem> result = new ArrayList<>();
 
         for(Candidate c : candidates) {
             org.example.backend.model.db.Candidate candidate = c.getDbCandidate();

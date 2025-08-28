@@ -4,12 +4,12 @@ package org.example.backend.model.db;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public record Election(
         String id, String name, String description,
-        Vector<String> candidateIDs,
-        Vector<Vote> votes,
+        ArrayList<String> candidateIDs,
+        ArrayList<Vote> votes,
         ElectionState electionState,
         ElectionType electionMethod,
         String candidateType,
