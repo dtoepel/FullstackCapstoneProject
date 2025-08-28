@@ -2,6 +2,7 @@ import type {Election} from "./ElectionData.ts";
 
 export type ElectionTableProps = {
     value:Election[];
+    onGetResult:(election:Election)=>void;
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
@@ -28,7 +29,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                             <td>{election.electionState}</td>
                             <td>{election.description}</td>
                             <td>TBD</td>
-                            <td>TBD</td>
+                            <td><button onClick={() => props.onGetResult(election)}>Result</button></td>
                         </tr>
                     )})}
                 </tbody>

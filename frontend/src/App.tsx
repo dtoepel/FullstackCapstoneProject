@@ -60,6 +60,14 @@ function App() {
         window.open(host + '/logout', '_self')
     }
 
+    function getElectionResults(election:Election):void {
+        axios.get("/api/election/results/" + election.id).then(
+            (response) => {
+                console.log(response.data)
+            }
+        )
+    }
+
     useEffect(() => {
         loadUser();
     }, []);
@@ -95,7 +103,7 @@ function App() {
         <h1>Election Manager</h1>
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
-            <Route path={"/"} element={<ElectionTable value={elections} />}/>
+            <Route path={"/"} element={<ElectionTable value={elections} onGetResult={getElectionResults}/>}/>
             <Route path={"/candidates/"} element={<CandidateTable value={candidates}/>}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
             <Route path={"/archive/"} element={"This is the archive page"}/>
