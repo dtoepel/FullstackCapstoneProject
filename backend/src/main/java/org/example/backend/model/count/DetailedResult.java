@@ -11,11 +11,11 @@ public class DetailedResult {
     private static final DecimalFormat PERCENT = new DecimalFormat("0.00");
 
     private void recordVoteCount(Candidate candidate, double votes) {
-        Vector<String> voteList = voteCounts.computeIfAbsent(candidate.candidate.id(), k -> new Vector<>());
+        Vector<String> voteList = voteCounts.computeIfAbsent(candidate.getDbCandidate().id(), k -> new Vector<>());
 
-        if(candidate.status == Candidate.CandidateStatus.ELECTED) {
+        if(candidate.getStatus() == Candidate.CandidateStatus.ELECTED) {
             voteList.add("ELECTED");
-        } else if(candidate.status == Candidate.CandidateStatus.EXCLUDED) {
+        } else if(candidate.getStatus() == Candidate.CandidateStatus.EXCLUDED) {
             voteList.add("EXCLUDED");
         } else {
             voteList.add(PERCENT.format(votes*100)+"%");
@@ -32,8 +32,8 @@ public class DetailedResult {
     }
 
     // Record candidates as elected or excluded. The order determines the order for the result
-    void recordElectedCandidate(Candidate candidate) {electedCandidateIDs.add(candidate.candidate.id());}
-    void recordExcludedCandidate(Candidate candidate) {excludedCandidateIDs.add(candidate.candidate.id());}
+    void recordElectedCandidate(Candidate candidate) {electedCandidateIDs.add(candidate.getDbCandidate().id());}
+    void recordExcludedCandidate(Candidate candidate) {excludedCandidateIDs.add(candidate.getDbCandidate().id());}
 
     public record ResultItem(String candidateID, Vector<String> votes) {}
 

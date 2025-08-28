@@ -3,36 +3,28 @@ package org.example.backend.model.count;
 import java.util.Comparator;
 
 class Candidate {
-    public org.example.backend.model.db.Candidate candidate;
-    public transient double weight = 1.0;
-    public transient CandidateStatus status = CandidateStatus.HOPEFUL;
-    public double random;
+    private final org.example.backend.model.db.Candidate dbCandidate;
+    private double weight = 1.0;
+    private CandidateStatus status = CandidateStatus.HOPEFUL;
+    public enum CandidateStatus {ELECTED, HOPEFUL, EXCLUDED}
+    private double random;
 
-    public Candidate(org.example.backend.model.db.Candidate candidate) {
-        this.candidate = candidate;
+
+    public Candidate(org.example.backend.model.db.Candidate dbCandidate) {
+        this.dbCandidate = dbCandidate;
         this.random = Math.random();
     }
 
-    public String getNameAndParty() {
-        return candidate.name() + " (" + (candidate.party()==null?"ind.":candidate.party()) + ")";
+    public void setStatus(CandidateStatus status) {
+        this.status = status;
+        if(this.status == CandidateStatus.HOPEFUL) {weight = 1.;}
+        else if(this.status == CandidateStatus.EXCLUDED) {weight = 0.;}
     }
 
-    public enum CandidateStatus {
-        ELECTED, HOPEFUL, EXCLUDED
-    }
+    CandidateStatus getStatus() { return status; }
+    org.example.backend.model.db.Candidate getDbCandidate() { return dbCandidate; }
+    double getWeight() { return weight; }
+    void setWeight(double weight) { this.weight = weight; }
+    double getRandom() { return random; }
 
-    public static class VoteSorter implements Comparator<Candidate> {
-        private final Count count;
-
-        VoteSorter(Count count) {
-            this.count = count;
-        }
-
-        @Override
-        public int compare(Candidate c1, Candidate c2) {
-            if(count.voteCount().get(c1) > count.voteCount().get(c2)) return 1;
-            if(count.voteCount().get(c1) < count.voteCount().get(c2)) return -1;
-            return Double.compare(c1.random, c2.random);
-        }
-    }
 }

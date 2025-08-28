@@ -1,6 +1,7 @@
 package org.example.backend.model.count;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
@@ -9,8 +10,8 @@ import static org.example.backend.model.count.Candidate.CandidateStatus.*;
 
 public class MeekAlgorithm {
 
-    private final Vector<org.example.backend.model.count.Candidate> candidates;
-    private final Vector<org.example.backend.model.count.Vote> votes;
+    private final ArrayList<Candidate> candidates;
+    private final ArrayList<org.example.backend.model.count.Vote> votes;
     private final int seats;
 
     private final HashMap<org.example.backend.model.db.Candidate, Integer> firstVotes;
@@ -26,13 +27,13 @@ public class MeekAlgorithm {
      */
     public MeekAlgorithm(Vector<org.example.backend.model.db.Candidate> candidates,
                          Vector<org.example.backend.model.db.Vote> votes, int seats)  {
-        this.candidates = new Vector<>();
+        this.candidates = new ArrayList<>();
         this.firstVotes = new HashMap<>();
         for(org.example.backend.model.db.Candidate c : candidates) {
             this.candidates.add(new Candidate(c));
             this.firstVotes.put(c, 0);
         }
-        this.votes = new Vector<>();
+        this.votes = new ArrayList<>();
         for(org.example.backend.model.db.Vote v : votes) {
             this.votes.add(new Vote(v, this.candidates));
             if(!v.rankingIDs().isEmpty()) {
@@ -62,7 +63,6 @@ public class MeekAlgorithm {
         // what to do next?
         // first count remaining (!ELIMINATED) Candidate
         while(getRemainingCandidatesCount()>seats) {
-            //int remainingCandidates = getRemainingCandidatesCount();
 
             // while there are too many candidates left.
             Count count = countVotes();
@@ -87,8 +87,8 @@ public class MeekAlgorithm {
         // if candidates have been reduced to available seats, then finalize
         // i.e. set all remaining HOPEFUL to ELECTED
         for (Candidate c : candidates) {
-            if (c.status == HOPEFUL) {
-                c.status = ELECTED;
+            if (c.getStatus() == HOPEFUL) {
+                c.setStatus(ELECTED);
 
                 result.recordElectedCandidate(c);
             }
@@ -100,11 +100,10 @@ public class MeekAlgorithm {
     private void excludeLast(DetailedResult result) {
         Count count = countVotes();
         Vector<Candidate> hopefulCandidates = new Vector<>();
-        for(Candidate c : candidates) if (c.status == HOPEFUL) hopefulCandidates.add(c);
-        hopefulCandidates.sort(new Candidate.VoteSorter(count));
+        for(Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
+        hopefulCandidates.sort(new VoteSorter(count));
 
-        hopefulCandidates.getFirst().status = EXCLUDED;
-        hopefulCandidates.getFirst().weight = 0.0;
+        hopefulCandidates.getFirst().setStatus(EXCLUDED);
 
         result.recordExcludedCandidate(hopefulCandidates.getFirst());
     }
@@ -113,12 +112,12 @@ public class MeekAlgorithm {
         Count count = countVotes();
         int newlyElected = 0;
         Vector<Candidate> hopefulCandidates = new Vector<>();
-        for(Candidate c : candidates) if (c.status == HOPEFUL) hopefulCandidates.add(c);
-        hopefulCandidates.sort(new Candidate.VoteSorter(count));
+        for(Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
+        hopefulCandidates.sort(new VoteSorter(count));
 
         for(Candidate c : hopefulCandidates) {
             if(count.voteCount().get(c) >= count.quota()) {
-                c.status = ELECTED;
+                c.setStatus(ELECTED);
                 newlyElected++;
                 result.recordElectedCandidate(c);
             }
@@ -130,15 +129,15 @@ public class MeekAlgorithm {
         Count count = countVotes();
         boolean ok = true;
         for(Candidate c : candidates) {
-            if(c.status == ELECTED) {
+            if(c.getStatus() == ELECTED) {
                 if(count.voteCount().get(c)/count.quota() < 0.9999) ok = false;
                 if(count.voteCount().get(c)/count.quota() > 1.0001) ok = false;
             }
         }
         if(!ok) {
             for(Candidate c : candidates) {
-                if(c.status == ELECTED) {
-                    c.weight = c.weight * count.quota() / count.voteCount().get(c);
+                if(c.getStatus() == ELECTED) {
+                    c.setWeight(c.getWeight() * count.quota() / count.voteCount().get(c));
                 }
             }
             findWeights();
@@ -156,13 +155,13 @@ public class MeekAlgorithm {
         }
         // then process ballot by ballot
         for(Vote v : votes) {
-            double vote = v.amount;
+            double vote = v.getAmount();
             total+=vote;
-            for(Candidate c : v.ranking) {
+            for(Candidate c : v.getRanking()) {
                 // for each rank, add the remaining vote * weight onto the candidate's count
                 // and deduct that from the remaining vote
-                voteCount.put(c, voteCount.get(c) + vote * c.weight);
-                vote -= vote * c.weight;
+                voteCount.put(c, voteCount.get(c) + vote * c.getWeight());
+                vote -= vote * c.getWeight();
             }
         }
 
@@ -176,7 +175,7 @@ public class MeekAlgorithm {
     private int getRemainingCandidatesCount() {
         int i = 0;
         for(Candidate c : candidates) {
-            if(c.status != EXCLUDED) i++;
+            if(c.getStatus() != EXCLUDED) i++;
         }
         return i;
     }
@@ -186,8 +185,7 @@ public class MeekAlgorithm {
      */
     public void reset() {
         for(Candidate c : candidates) {
-            c.status = HOPEFUL;
-            c.weight = 1.;
+            c.setStatus(HOPEFUL);
         }
     }
 
@@ -195,12 +193,12 @@ public class MeekAlgorithm {
         Vector<ElectionResultItem> result = new Vector<>();
 
         for(Candidate c : candidates) {
-            org.example.backend.model.db.Candidate candidate = c.candidate;
+            org.example.backend.model.db.Candidate candidate = c.getDbCandidate();
             result.add(new ElectionResultItem(
                     candidate,
                     FORMAT.format(100.*firstVotes.get(candidate)/votes.size())+"%",
-                    c.status!=EXCLUDED,
-                    c.status!=EXCLUDED?"default":"void"));
+                    c.getStatus()!=EXCLUDED,
+                    c.getStatus()!=EXCLUDED?"default":"void"));
         }
 
         Collections.sort(result, (o1, o2) ->
