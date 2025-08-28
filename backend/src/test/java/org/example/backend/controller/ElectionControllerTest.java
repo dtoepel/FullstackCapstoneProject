@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 @SpringBootTest
@@ -35,8 +36,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -73,8 +74,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -120,8 +121,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -155,8 +156,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -204,8 +205,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",

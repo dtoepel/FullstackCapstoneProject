@@ -1,17 +1,18 @@
 package org.example.backend.model.count;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
 public class DetailedResult {
-    private final Vector<String> electedCandidateIDs = new Vector<>();
-    private final Vector<String> excludedCandidateIDs = new Vector<>();
-    private final HashMap<String,Vector<String>> voteCounts = new HashMap<>();
+    private final ArrayList<String> electedCandidateIDs = new ArrayList<>();
+    private final ArrayList<String> excludedCandidateIDs = new ArrayList<>();
+    private final HashMap<String,ArrayList<String>> voteCounts = new HashMap<>();
     private static final DecimalFormat PERCENT = new DecimalFormat("0.00");
 
     private void recordVoteCount(Candidate candidate, double votes) {
-        Vector<String> voteList = voteCounts.computeIfAbsent(candidate.getDbCandidate().id(), k -> new Vector<>());
+        ArrayList<String> voteList = voteCounts.computeIfAbsent(candidate.getDbCandidate().id(), k -> new ArrayList<>());
 
         if(candidate.getStatus() == Candidate.CandidateStatus.ELECTED) {
             voteList.add("ELECTED");
@@ -35,15 +36,15 @@ public class DetailedResult {
     void recordElectedCandidate(Candidate candidate) {electedCandidateIDs.add(candidate.getDbCandidate().id());}
     void recordExcludedCandidate(Candidate candidate) {excludedCandidateIDs.add(candidate.getDbCandidate().id());}
 
-    public record ResultItem(String candidateID, Vector<String> votes) {}
+    public record ResultItem(String candidateID, ArrayList<String> votes) {}
 
-    public Vector<ResultItem> get() {
-        Vector<ResultItem> items = new Vector<>();
+    public ArrayList<ResultItem> get() {
+        ArrayList<ResultItem> items = new ArrayList<>();
         for(String candidateID : electedCandidateIDs) {
-            items.add(new ResultItem(candidateID, voteCounts.getOrDefault(candidateID, new Vector<>())));
+            items.add(new ResultItem(candidateID, voteCounts.getOrDefault(candidateID, new ArrayList<>())));
         }
         for(String candidateID : excludedCandidateIDs.reversed()) {
-            items.add(new ResultItem(candidateID, voteCounts.getOrDefault(candidateID, new Vector<>())));
+            items.add(new ResultItem(candidateID, voteCounts.getOrDefault(candidateID, new ArrayList<>())));
         }
         return items;
     }

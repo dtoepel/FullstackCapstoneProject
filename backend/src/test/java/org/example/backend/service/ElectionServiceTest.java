@@ -7,6 +7,7 @@ import org.example.backend.repository.ElectionRepo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,8 +26,8 @@ class ElectionServiceTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -54,8 +55,8 @@ class ElectionServiceTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",

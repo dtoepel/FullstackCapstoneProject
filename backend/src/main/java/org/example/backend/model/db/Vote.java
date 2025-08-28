@@ -1,6 +1,5 @@
 package org.example.backend.model.db;
 
+import java.util.List;
 
-import java.util.Vector;
-
-public record Vote(Vector<String> rankingIDs) {}
+public record Vote(List<String> rankingIDs) {}

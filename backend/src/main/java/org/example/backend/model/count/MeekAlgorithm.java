@@ -20,31 +20,31 @@ public class MeekAlgorithm {
      * This does not start the distribution, so that other parameters can be set before.
      * Initializes all candidates as if reset had been invoked.
      * The distribution is performed using perform().
+     *
      * @param candidates The candidates standing in the election
-     * @param votes The votes cast
-     * @param seats The number of seats to be awarded
+     * @param votes      The votes cast
+     * @param seats      The number of seats to be awarded
      */
     public MeekAlgorithm(ArrayList<org.example.backend.model.db.Candidate> candidates,
-                         ArrayList<org.example.backend.model.db.Vote> votes, int seats)  {
+                         ArrayList<org.example.backend.model.db.Vote> votes, int seats) {
         this.candidates = new ArrayList<>();
         this.firstVotes = new HashMap<>();
-        for(org.example.backend.model.db.Candidate c : candidates) {
+        for (org.example.backend.model.db.Candidate c : candidates) {
             this.candidates.add(new Candidate(c));
             this.firstVotes.put(c, 0);
         }
         this.votes = new ArrayList<>();
-        for(org.example.backend.model.db.Vote v : votes) {
+        for (org.example.backend.model.db.Vote v : votes) {
             this.votes.add(new Vote(v, this.candidates, 1.));
-            if(!v.rankingIDs().isEmpty()) {
-                for(org.example.backend.model.db.Candidate c : candidates) {
-                    if(c.id().equals(v.rankingIDs().firstElement())) {
+            if (!v.rankingIDs().isEmpty()) {
+                for (org.example.backend.model.db.Candidate c : candidates) {
+                    if (c.id().equals(v.rankingIDs().getFirst())) {
                         this.firstVotes.put(c, this.firstVotes.get(c) + 1);
                     }
                 }
             }
         }
         this.seats = seats;
-        reset();
     }
 
     /**
@@ -53,7 +53,6 @@ public class MeekAlgorithm {
      * which is the case right after using the constructor.
      * Other configurations may yield unexpected results.
      * Candidates which have a different status will keep that status.
-     *
      */
     public DetailedResult perform() {
         DetailedResult result = new DetailedResult();
@@ -61,7 +60,7 @@ public class MeekAlgorithm {
         // next iteration:
         // what to do next?
         // first count remaining (!ELIMINATED) Candidate
-        while(getRemainingCandidatesCount()>seats) {
+        while (getRemainingCandidatesCount() > seats) {
 
             // while there are too many candidates left.
             Count count = countVotes();
@@ -99,7 +98,7 @@ public class MeekAlgorithm {
     private void excludeLast(DetailedResult result) {
         Count count = countVotes();
         ArrayList<Candidate> hopefulCandidates = new ArrayList<>();
-        for(Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
+        for (Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
         hopefulCandidates.sort(new VoteSorter(count));
 
         hopefulCandidates.getFirst().setStatus(EXCLUDED);
@@ -111,11 +110,11 @@ public class MeekAlgorithm {
         Count count = countVotes();
         int newlyElected = 0;
         ArrayList<Candidate> hopefulCandidates = new ArrayList<>();
-        for(Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
+        for (Candidate c : candidates) if (c.getStatus() == HOPEFUL) hopefulCandidates.add(c);
         hopefulCandidates.sort(new VoteSorter(count));
 
-        for(Candidate c : hopefulCandidates) {
-            if(count.voteCount().get(c) >= count.quota()) {
+        for (Candidate c : hopefulCandidates) {
+            if (count.voteCount().get(c) >= count.quota()) {
                 c.setStatus(ELECTED);
                 newlyElected++;
                 result.recordElectedCandidate(c);
@@ -127,15 +126,15 @@ public class MeekAlgorithm {
     private void findWeights() {
         Count count = countVotes();
         boolean ok = true;
-        for(Candidate c : candidates) {
-            if(c.getStatus() == ELECTED) {
-                if(count.voteCount().get(c)/count.quota() < 0.9999) ok = false;
-                if(count.voteCount().get(c)/count.quota() > 1.0001) ok = false;
+        for (Candidate c : candidates) {
+            if (c.getStatus() == ELECTED) {
+                if (count.voteCount().get(c) / count.quota() < 0.9999) ok = false;
+                if (count.voteCount().get(c) / count.quota() > 1.0001) ok = false;
             }
         }
-        if(!ok) {
-            for(Candidate c : candidates) {
-                if(c.getStatus() == ELECTED) {
+        if (!ok) {
+            for (Candidate c : candidates) {
+                if (c.getStatus() == ELECTED) {
                     c.setWeight(c.getWeight() * count.quota() / count.voteCount().get(c));
                 }
             }
@@ -149,14 +148,14 @@ public class MeekAlgorithm {
 
         HashMap<Candidate, Double> voteCount = new HashMap<>();
         // initialize all candidates with zero votes
-        for(Candidate c : candidates) {
+        for (Candidate c : candidates) {
             voteCount.put(c, 0.0);
         }
         // then process ballot by ballot
-        for(Vote v : votes) {
+        for (Vote v : votes) {
             double vote = v.getAmount();
-            total+=vote;
-            for(Candidate c : v.getRanking()) {
+            total += vote;
+            for (Candidate c : v.getRanking()) {
                 // for each rank, add the remaining vote * weight onto the candidate's count
                 // and deduct that from the remaining vote
                 voteCount.put(c, voteCount.get(c) + vote * c.getWeight());
@@ -166,46 +165,16 @@ public class MeekAlgorithm {
 
         // to calculate the excess, count the number of votes and deduct non-exhausted, i.e. counted votes
         excess = total;
-        for(Candidate c : candidates) excess-=voteCount.get(c);
+        for (Candidate c : candidates) excess -= voteCount.get(c);
 
-        return new Count(voteCount, total, excess, (total-excess)/(seats+.999));
+        return new Count(voteCount, total, excess, (total - excess) / (seats + .999));
     }
 
     private int getRemainingCandidatesCount() {
         int i = 0;
-        for(Candidate c : candidates) {
-            if(c.getStatus() != EXCLUDED) i++;
+        for (Candidate c : candidates) {
+            if (c.getStatus() != EXCLUDED) i++;
         }
         return i;
     }
-
-    /**
-     * Resets the algorithm, setting the status of all candidates to HOPEFUL.
-     */
-    public void reset() {
-        for(Candidate c : candidates) {
-            c.setStatus(HOPEFUL);
-        }
-    }
-
-    public ArrayList<ElectionResultItem> getResult() {
-        ArrayList<ElectionResultItem> result = new ArrayList<>();
-
-        for(Candidate c : candidates) {
-            org.example.backend.model.db.Candidate candidate = c.getDbCandidate();
-            result.add(new ElectionResultItem(
-                    candidate,
-                    FORMAT.format(100.*firstVotes.get(candidate)/votes.size())+"%",
-                    c.getStatus()!=EXCLUDED,
-                    c.getStatus()!=EXCLUDED?"default":"void"));
-        }
-
-        Collections.sort(result, (o1, o2) ->
-                firstVotes.get(o1.candidate).compareTo(firstVotes.get(o2.candidate)));
-        Collections.reverse(result);
-        return result;
-    }
-
-    public record ElectionResultItem(org.example.backend.model.db.Candidate candidate, String firstVotes, boolean elected, String electedAs) {}
-    private static final DecimalFormat FORMAT = new DecimalFormat("0.00");
 }

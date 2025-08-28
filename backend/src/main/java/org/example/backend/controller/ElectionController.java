@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
@@ -51,7 +52,7 @@ public class ElectionController {
                         init.name(),
                         init.description(),
                         init.candidateIDs(),
-                        new Vector<>(),
+                        new ArrayList<>(),
                         Election.ElectionState.OPEN,
                         init.electionMethod(),
                         init.candidateType(),
