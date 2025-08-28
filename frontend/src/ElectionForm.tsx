@@ -4,6 +4,7 @@ import type {FormEvent} from "react";
 export type EditElectionFormProps = {
     editMode:boolean;
     election:Election;
+    error:string|null;
     candidates:Candidate[];
     onEdit:(election:Election)=>void;
     onSubmit:()=>void
@@ -95,8 +96,10 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                 <tr>
                     <td>id</td>
                     <td>
-                        <input value={props.election.id}
+                        {props.editMode?props.election.id:
+                            <input value={props.election.id}
                                onChange={(e) => changeID(e.target.value)}/>
+                        }
                     </td>
                 </tr>
                 <tr>
@@ -163,6 +166,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                 </tr>
                 </tbody>
             </table>
+            {props.error?<p className={"error-message"}>{props.error}</p>:""}
             <form onSubmit={(e) => submit(e)}><button>Submit</button></form>
         </div>
     )

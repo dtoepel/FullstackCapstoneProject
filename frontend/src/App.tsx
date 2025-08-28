@@ -32,7 +32,18 @@ function App() {
     };
 
     // temporary variables for forms
-    const [editElection, setEditElection] = useState<Election>(defaultElection);
+    type EditElectionProps = {
+        election:Election
+        editMode:boolean;
+        error:string|null;
+        onSuccess:()=>void;
+    }
+
+    const [editElectionProps, setEditElectionProps] = useState<EditElectionProps>({
+        election:defaultElection,
+        editMode:false,
+        error:null,
+        onSuccess:()=>{}});
 
 
     // only place to update data
@@ -54,22 +65,29 @@ function App() {
         getAllElectionsAndCandidates()
     },[])
 
-
     // functions to backend for editing
     function createElection():void {
-        axios.post("/api/election", editElection)
+        axios.post("/api/election", editElectionProps.election)
             .then(() => {getAllElectionsAndCandidates(); nav("/")})
             .catch(error => {
                 console.log(error);
-                if(error.response && error.response.code == 400) {
-                    console.log("error handling");
+                console.log(error.status);
+                if(error.status == 403) {
+                    console.log(error.response.data.message);
+                    setEditElectionProps({...editElectionProps, error:error.response.data.message})
                 }
             })
     }
 
     function updateElection(election:Election) {
         axios.put("/api/election", election)
-            .then(getAllElectionsAndCandidates)
+            .then(() => {getAllElectionsAndCandidates(); nav("/")})
+            .catch(error => {
+                console.log(error);
+                if(error.response && error.response.status == 404) {
+                    setEditElectionProps({...editElectionProps, error:error.response.data.message})
+                }
+            })
     }
 
     // authorization
@@ -131,27 +149,39 @@ function App() {
             <Route path={"/"} element={<ElectionTable
                 value={elections}
                 onCreateElection={() => {
-                    setEditElection(defaultElection);
+                    setEditElectionProps({
+                        election:defaultElection,
+                        editMode:false,
+                        error:null,
+                        onSuccess:() => nav("/")
+                    });
                     nav("/createElection/")
                 }}
                 onEditElection={(election) => {
-                    setEditElection(election);
+                    setEditElectionProps({
+                        election:election,
+                        editMode:true,
+                        error:null,
+                        onSuccess:() => nav("/")
+                    })
                     nav("/editElection/")
                 }}
             />}/>
             <Route path={"/createElection/"} element={<ElectionForm
-                election={editElection}
+                election={editElectionProps.election}
                 candidates={candidates}
-                editMode={false}
-                onEdit={setEditElection}
+                editMode={editElectionProps.editMode}
+                error={editElectionProps.error}
+                onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
                 onSubmit={createElection}
             />}/>
             <Route path={"/editElection/"} element={<ElectionForm
-                election={editElection}
+                election={editElectionProps.election}
                 candidates={candidates}
-                editMode={true}
-                onEdit={setEditElection}
-                onSubmit={() => updateElection(editElection)}
+                editMode={editElectionProps.editMode}
+                error={editElectionProps.error}
+                onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
+                onSubmit={() => updateElection(editElectionProps.election)}
             />}/>
             <Route path={"/candidates/"} element={<CandidateTable value={candidates}/>}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
