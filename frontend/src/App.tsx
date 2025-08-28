@@ -68,7 +68,7 @@ function App() {
     // functions to backend for editing
     function createElection():void {
         axios.post("/api/election", editElectionProps.election)
-            .then(() => {getAllElectionsAndCandidates(); nav("/")})
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
                 console.log(error);
                 console.log(error.status);
@@ -81,7 +81,7 @@ function App() {
 
     function updateElection(election:Election) {
         axios.put("/api/election", election)
-            .then(() => {getAllElectionsAndCandidates(); nav("/")})
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
                 console.log(error);
                 if(error.response && error.response.status == 404) {
