@@ -1,13 +1,11 @@
 package org.example.backend.model.count;
 
-import java.util.Comparator;
-
 class Candidate {
     private final org.example.backend.model.db.Candidate dbCandidate;
     private double weight = 1.0;
     private CandidateStatus status = CandidateStatus.HOPEFUL;
     public enum CandidateStatus {ELECTED, HOPEFUL, EXCLUDED}
-    private double random;
+    private final double random;
 
 
     public Candidate(org.example.backend.model.db.Candidate dbCandidate) {
