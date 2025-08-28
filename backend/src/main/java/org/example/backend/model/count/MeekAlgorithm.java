@@ -35,7 +35,7 @@ public class MeekAlgorithm {
         }
         this.votes = new ArrayList<>();
         for(org.example.backend.model.db.Vote v : votes) {
-            this.votes.add(new Vote(v, this.candidates));
+            this.votes.add(new Vote(v, this.candidates, 1.));
             if(!v.rankingIDs().isEmpty()) {
                 for(org.example.backend.model.db.Candidate c : candidates) {
                     if(c.id().equals(v.rankingIDs().firstElement())) {
