@@ -37,7 +37,7 @@ public class ElectionController {
                         init.candidateIDs(),
                         new Vector<>(),
                         Election.ElectionState.OPEN,
-                        init.electionType(),
+                        init.electionMethod(),
                         init.candidateType(),
                         init.seats())),
                 HttpStatus.CREATED);

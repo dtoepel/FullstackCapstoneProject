@@ -92,6 +92,11 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
     return(
         <div style={{display:"flex", flexDirection:"column"}}>
             <table>
+                <thead>
+                    <tr>
+                        <th>Key</th><th>Value</th>
+                    </tr>
+                </thead>
                 <tbody>
                 <tr>
                     <td>id</td>
@@ -147,7 +152,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
             </table>
             <table>
                 <thead>
-                <tr><td>Running Candidates</td><td>Available Candidates</td></tr>
+                <tr><th>Running Candidates</th><th>Available Candidates</th></tr>
                 </thead>
                 <tbody>
                 <tr>
