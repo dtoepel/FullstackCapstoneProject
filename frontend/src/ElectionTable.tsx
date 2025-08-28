@@ -4,11 +4,15 @@ import CandidateBox from "./CandidateBox.tsx";
 export type ElectionTableProps = {
     elections:Election[];
     candidates:Candidate[];
+    onCreateElection:()=>void;
+    onEditElection:(election:Election)=>void;
+
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
     return(
         <>
+            <button onClick={() => props.onCreateElection()}>Create</button>
             <table border={1}>
                 <thead>
                 <tr>
@@ -29,7 +33,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                     });
 
                     return(
-                        <tr>
+                        <tr key={election.id}>
                             <td>{election.id}</td>
                             <td>{election.name}</td>
                             <td>{election.electionState}</td>
@@ -39,7 +43,9 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                                     <CandidateBox candidate={candidate}/>
                                 )})}
                             </div></td>
-                            <td>TBD</td>
+                            <td>
+                                <button onClick={() => props.onEditElection(election)}>Edit</button>
+                            </td>
                         </tr>
                     )})}
                 </tbody>
