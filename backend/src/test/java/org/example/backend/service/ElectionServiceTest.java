@@ -1,6 +1,8 @@
 package org.example.backend.service;
 
+import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Election;
+import org.example.backend.repository.CandidateRepo;
 import org.example.backend.repository.ElectionRepo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,7 +20,8 @@ class ElectionServiceTest {
         // given
 
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo);
+        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
         Election election = new Election(
                 "1",
                 "MyElection",
@@ -40,5 +43,33 @@ class ElectionServiceTest {
                 .containsExactly(election);
         verify(electionRepo, times(1)).findAll();
         verifyNoMoreInteractions(electionRepo);
+    }
+
+
+    @Test
+    void getAllCandidates() {
+        // given
+
+        ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
+        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        Candidate candidate = new Candidate(
+                "-1",
+                "John Doe",
+                "Independent",
+                "#444",
+                "some details",
+                "Person");
+
+        // when
+        when(candidateRepo.findAll()).thenReturn(java.util.List.of(candidate));
+        java.util.List<Candidate> result = electionService.getAllCandidates();
+
+        // then
+        assertThat(result)
+                .hasSize(1)
+                .containsExactly(candidate);
+        verify(candidateRepo, times(1)).findAll();
+        verifyNoMoreInteractions(candidateRepo);
     }
 }

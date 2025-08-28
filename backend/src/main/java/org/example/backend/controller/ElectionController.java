@@ -1,5 +1,6 @@
 package org.example.backend.controller;
 
+import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Election;
 import org.example.backend.service.ElectionService;
 import org.springframework.web.bind.annotation.*;
@@ -17,4 +18,8 @@ public class ElectionController {
 
     @GetMapping
     public List<Election> getAllElections() { return electionService.getAllElections(); }
+
+
+    @GetMapping("/candidates")
+    public List<Candidate> getAllCandidates() { return electionService.getAllCandidates(); }
 }

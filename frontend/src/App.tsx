@@ -1,7 +1,7 @@
 import './App.css'
 import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import type {Election} from "./ElectionData.ts";
+import type {Candidate, Election} from "./ElectionData.ts";
 import ElectionTable from "./ElectionTable.tsx";
 import axios from "axios";
 import NavigationItem from "./NavigationItem.tsx";
@@ -11,12 +11,14 @@ import archiveLogo from './assets/archive-inv.svg'
 import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
+import CandidateTable from "./CandidateTable.tsx";
 
 function App() {
     const nav = useNavigate();
 
     // main model
     const [elections, setElections] = useState<Election[]>([]);
+    const [candidates, setCandidates] = useState<Candidate[]>([]);
 
     // only place to update data
     // could be split to reduce traffic by a small amount
@@ -24,11 +26,11 @@ function App() {
         axios.get("/api/election").then(
             (response) => {
                 setElections(response.data);
-                /*axios.get("/api/election/candidates").then(
+                axios.get("/api/election/candidates").then(
                     (response) => {
                         setCandidates(response.data);
                     }
-                )*/
+                )
             }
         )
     }
@@ -94,7 +96,7 @@ function App() {
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
             <Route path={"/"} element={<ElectionTable value={elections} />}/>
-            <Route path={"/candidates/"} element={"This is the candidate page"}/>
+            <Route path={"/candidates/"} element={<CandidateTable value={candidates}/>}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
             <Route path={"/archive/"} element={"This is the archive page"}/>
             <Route path={"/result/"} element={"This is the result page"}/>

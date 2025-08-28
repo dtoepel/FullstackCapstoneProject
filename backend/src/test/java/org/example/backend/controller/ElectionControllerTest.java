@@ -1,5 +1,7 @@
 package org.example.backend.controller;
 
+import org.example.backend.model.db.Candidate;
+import org.example.backend.repository.CandidateRepo;
 import org.junit.jupiter.api.Test;
 import org.example.backend.model.db.Election;
 import org.example.backend.repository.ElectionRepo;
@@ -20,11 +22,14 @@ public class ElectionControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ElectionRepo repo;
+    private ElectionRepo electionRepo;
+    @Autowired
+    private CandidateRepo candidateRepo;
 
     @Test
     void getAllProducts() throws Exception {
 
+        //GIVEN
         Election election = new Election(
                 "1",
                 "MyElection",
@@ -35,8 +40,8 @@ public class ElectionControllerTest {
                 Election.ElectionType.STV,
                 "Person",
                 3);
+        electionRepo.save(election);
 
-        repo.save(election);
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.get("/api/election"))
             //THEN
@@ -46,9 +51,50 @@ public class ElectionControllerTest {
                             [
                               {
                                 "id": "1",
-                                "name": "MyElection"
+                                "name": "MyElection",
+                                "description": "some details",
+                                "candidateIDs": [],
+                                "votes": [],
+                                "electionState": "OPEN",
+                                "electionType": "STV",
+                                "candidateType": "Person",
+                                "seats": 3
                               }
                             ]
                             """));
     }
+
+    @Test
+    void getAllCandidates() throws Exception {
+
+        //GIVEN
+        Candidate candidate = new Candidate(
+                "-1",
+                "John Doe",
+                "Independent",
+                "#444",
+                "some details",
+                "Person");
+        candidateRepo.save(candidate);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/candidates"))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(
+                    """ 
+                                [
+                                  {
+                                    "name": "John Doe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#444",
+                                    "type": "Person"
+                                  }
+                                ]
+                                """))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
+
+    }
+
 }
