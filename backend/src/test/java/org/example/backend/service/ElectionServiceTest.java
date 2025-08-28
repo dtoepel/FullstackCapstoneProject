@@ -17,8 +17,7 @@ class ElectionServiceTest {
 
     @Test
     void getAllElections() {
-        // given
-
+        // GIVEN
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
         ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
@@ -33,11 +32,11 @@ class ElectionServiceTest {
                 "Person",
                 3);
 
-        // when
+        // WHEN
         when(electionRepo.findAll()).thenReturn(java.util.List.of(election));
         java.util.List<Election> result = electionService.getAllElections();
 
-        // then
+        // THEN
         assertThat(result)
                 .hasSize(1)
                 .containsExactly(election);
@@ -45,6 +44,32 @@ class ElectionServiceTest {
         verifyNoMoreInteractions(electionRepo);
     }
 
+    @Test
+    void createElection() {
+        //GIVEN
+        ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
+        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        Election election = new Election(
+                "1",
+                "MyElection",
+                "some details",
+                new Vector<>(),
+                new Vector<>(),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "Person",
+                3);
+        //WHEN
+        when(electionRepo.save(election)).thenReturn(election);
+        Election result = electionService.createElection(election);
+
+        //THEN
+        assertThat(result)
+                .isEqualTo(election);
+        verify(electionRepo, times(1)).save(election);
+        verifyNoMoreInteractions(electionRepo);
+    }
 
     @Test
     void getAllCandidates() {
