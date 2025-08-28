@@ -12,6 +12,6 @@ public class AuthController {
 
     @GetMapping("/me")
     public String getMe(@AuthenticationPrincipal OAuth2User user) {
-        return user.getAttributes().get("login").toString();
+        return user==null?null:user.getAttributes().get("login").toString();
     }
 }
