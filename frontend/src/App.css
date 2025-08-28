@@ -51,3 +51,11 @@ div.navigation-item > p {
 div.navigation-item > img {
   padding: 4px;
 }
+
+p.error-message {
+  color: #b00;
+  background-color: #faa;
+  border-radius: 10px;
+  border: 3px #b00 solid;
+  padding: 10px;
+}

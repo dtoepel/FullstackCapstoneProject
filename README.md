@@ -1,4 +1,4 @@
-The election manager allows the user to manage election, candidates and voters.
+The election manager allows the user to manage elections, candidates and voters.
 
 https://electionmanagement-55ha.onrender.com
 
