@@ -17,14 +17,14 @@ class Candidate {
         return candidate.name() + " (" + (candidate.party()==null?"ind.":candidate.party()) + ")";
     }
 
-    public static enum CandidateStatus {
+    public enum CandidateStatus {
         ELECTED, HOPEFUL, EXCLUDED
     }
 
     public static class VoteSorter implements Comparator<Candidate> {
         private final Count count;
 
-        public VoteSorter(Count count) {
+        VoteSorter(Count count) {
             this.count = count;
         }
 

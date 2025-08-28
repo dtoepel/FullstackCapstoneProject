@@ -2,7 +2,6 @@ package org.example.backend.controller;
 
 import org.example.backend.model.count.CountService;
 import org.example.backend.model.count.DetailedResult;
-import org.example.backend.model.count.MeekAlgorithm;
 import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Election;
 import org.example.backend.model.db.ElectionDTO;

@@ -62,7 +62,7 @@ public class MeekAlgorithm {
         // what to do next?
         // first count remaining (!ELIMINATED) Candidate
         while(getRemainingCandidatesCount()>seats) {
-            int remainingCandidates = getRemainingCandidatesCount();
+            //int remainingCandidates = getRemainingCandidatesCount();
 
             // while there are too many candidates left.
             Count count = countVotes();
