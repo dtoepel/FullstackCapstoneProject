@@ -1,17 +1,22 @@
 import './App.css'
-import {Route, Routes, useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
-import type {Candidate, Election} from "./ElectionData.ts";
-import ElectionTable from "./ElectionTable.tsx";
-import axios from "axios";
-import NavigationItem from "./NavigationItem.tsx";
+
 import electionLogo from './assets/election.svg'
 import candidatesLogo from './assets/candidates.svg'
 import archiveLogo from './assets/archive-inv.svg'
 import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
+
+import type {Candidate, Election} from "./ElectionData.ts";
+
+import ElectionTable from "./ElectionTable.tsx";
+import NavigationItem from "./NavigationItem.tsx";
 import CandidateTable from "./CandidateTable.tsx";
+import ElectionForm from "./ElectionForm.tsx";
+
+import {Route, Routes, useNavigate} from "react-router-dom";
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 function App() {
     const nav = useNavigate();
@@ -19,6 +24,27 @@ function App() {
     // main model
     const [elections, setElections] = useState<Election[]>([]);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
+
+    // default values for forms
+    const defaultElection:Election = {
+        name:"new Election",id:"ABC00",candidateIDs:[],votes:[],electionState:"OPEN",
+        description:"Enter description here...",seats:1,electionMethod:"STV",candidateType:"Person"
+    };
+
+    // temporary variables for forms
+    type EditElectionProps = {
+        election:Election
+        editMode:boolean;
+        error:string|null;
+        onSuccess:()=>void;
+    }
+
+    const [editElectionProps, setEditElectionProps] = useState<EditElectionProps>({
+        election:defaultElection,
+        editMode:false,
+        error:null,
+        onSuccess:()=>{}});
+
 
     // only place to update data
     // could be split to reduce traffic by a small amount
@@ -38,6 +64,31 @@ function App() {
     useEffect(() => {
         getAllElectionsAndCandidates()
     },[])
+
+    // functions to backend for editing
+    function createElection():void {
+        axios.post("/api/election", editElectionProps.election)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => {
+                console.log(error);
+                console.log(error.status);
+                if(error.status == 403) {
+                    console.log(error.response.data.message);
+                    setEditElectionProps({...editElectionProps, error:error.response.data.message})
+                }
+            })
+    }
+
+    function updateElection(election:Election) {
+        axios.put("/api/election", election)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => {
+                console.log(error);
+                if(error.response && error.response.status == 404) {
+                    setEditElectionProps({...editElectionProps, error:error.response.data.message})
+                }
+            })
+    }
 
     // authorization
     const [user, setUser] = useState<string | undefined | null>(undefined);
@@ -103,7 +154,44 @@ function App() {
         <h1>Election Manager</h1>
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
-            <Route path={"/"} element={<ElectionTable value={elections} onGetResult={getElectionResults}/>}/>
+            <Route path={"/"} element={<ElectionTable
+                value={elections}
+                onGetResult={getElectionResults}
+                onCreateElection={() => {
+                    setEditElectionProps({
+                        election:defaultElection,
+                        editMode:false,
+                        error:null,
+                        onSuccess:() => nav("/")
+                    });
+                    nav("/createElection/")
+                }}
+                onEditElection={(election) => {
+                    setEditElectionProps({
+                        election:election,
+                        editMode:true,
+                        error:null,
+                        onSuccess:() => nav("/")
+                    })
+                    nav("/editElection/")
+                }}
+            />}/>
+            <Route path={"/createElection/"} element={<ElectionForm
+                election={editElectionProps.election}
+                candidates={candidates}
+                editMode={editElectionProps.editMode}
+                error={editElectionProps.error}
+                onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
+                onSubmit={createElection}
+            />}/>
+            <Route path={"/editElection/"} element={<ElectionForm
+                election={editElectionProps.election}
+                candidates={candidates}
+                editMode={editElectionProps.editMode}
+                error={editElectionProps.error}
+                onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
+                onSubmit={() => updateElection(editElectionProps.election)}
+            />}/>
             <Route path={"/candidates/"} element={<CandidateTable value={candidates}/>}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
             <Route path={"/archive/"} element={"This is the archive page"}/>

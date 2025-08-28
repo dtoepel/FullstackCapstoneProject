@@ -2,12 +2,15 @@ import type {Election} from "./ElectionData.ts";
 
 export type ElectionTableProps = {
     value:Election[];
+    onCreateElection:()=>void;
+    onEditElection:(election:Election)=>void;
     onGetResult:(election:Election)=>void;
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
     return(
         <>
+            <button onClick={() => props.onCreateElection()}>Create</button>
             <table border={1}>
                 <thead>
                 <tr>
@@ -23,13 +26,16 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                 {props.value.map((election) => {
 
                     return(
-                        <tr>
+                        <tr key={election.id}>
                             <td>{election.id}</td>
                             <td>{election.name}</td>
                             <td>{election.electionState}</td>
                             <td>{election.description}</td>
                             <td>TBD</td>
-                            <td><button onClick={() => props.onGetResult(election)}>Result</button></td>
+                            <td>
+                                <button onClick={() => props.onEditElection(election)}>Edit</button>
+                                <button onClick={() => props.onGetResult(election)}>Result</button>
+                            </td>
                         </tr>
                     )})}
                 </tbody>

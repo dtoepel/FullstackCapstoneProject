@@ -8,6 +8,7 @@ import org.example.backend.repository.ElectionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -56,12 +57,180 @@ public class ElectionControllerTest {
                                 "candidateIDs": [],
                                 "votes": [],
                                 "electionState": "OPEN",
-                                "electionType": "STV",
+                                "electionMethod": "STV",
                                 "candidateType": "Person",
                                 "seats": 3
                               }
                             ]
                             """));
+    }
+
+
+    @Test
+    void createElectionSuccess() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "1",
+                "MyElection",
+                "some details",
+                new Vector<>(),
+                new Vector<>(),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "Person",
+                3);
+        electionRepo.save(existingElection);
+        //WHEN
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 3
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().json(
+                        """ 
+                                {
+                                    "id": "2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": [],
+                                    "electionState": "OPEN",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 3
+                                }
+                                """));
+    }
+
+    @Test
+    void createElectionDuplicate() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "1",
+                "MyElection",
+                "some details",
+                new Vector<>(),
+                new Vector<>(),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "Person",
+                3);
+        electionRepo.save(existingElection);
+        //WHEN
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "1",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 3
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.DuplicateIdException.reason));
+    }
+
+
+    @Test
+    void updateElectionSuccess() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "1",
+                "MyElection",
+                "some details",
+                new Vector<>(),
+                new Vector<>(),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "Person",
+                3);
+        electionRepo.save(existingElection);
+        //WHEN
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "1",
+                                    "name": "MyElection",
+                                    "description": "some other details",
+                                    "candidateIDs": [],
+                                    "electionState": "OPEN",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 4
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isAccepted())
+                .andExpect(MockMvcResultMatchers.content().json(
+                        """ 
+                                {
+                                    "id": "1",
+                                    "name": "MyElection",
+                                    "description": "some other details",
+                                    "candidateIDs": [],
+                                    "electionState": "OPEN",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 4
+                                }
+                                """));
+    }
+
+    @Test
+    void updateElectionNotFound() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "1",
+                "MyElection",
+                "some details",
+                new Vector<>(),
+                new Vector<>(),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "Person",
+                3);
+        electionRepo.save(existingElection);
+        //WHEN
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "404",
+                                    "name": "MyElection",
+                                    "description": "some other details",
+                                    "candidateIDs": [],
+                                    "electionState": "OPEN",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 4
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.reason));
     }
 
     @Test
@@ -96,5 +265,4 @@ public class ElectionControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
 
     }
-
 }

@@ -20,6 +20,8 @@ public class ElectionService {
     }
 
     public List<Election> getAllElections() { return electionRepo.findAll(); }
+    public Election createElection(Election election) { return electionRepo.save(election); }
+    public Election updateElection(Election election) { return electionRepo.save(election); }
 
     public Optional<Election> getElectionById(String id) { return electionRepo.findById(id); }
 
