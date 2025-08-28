@@ -6,7 +6,7 @@ export type Election = {
     seats:number;
     candidateIDs:string[];
     candidateType:string;
-    electionType:string;
+    electionMethod:string;
     votes:Vote[];
 }
 
