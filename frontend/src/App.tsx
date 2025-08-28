@@ -95,8 +95,11 @@ function App() {
         <h1>Election Manager</h1>
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
-            <Route path={"/"} element={<ElectionTable value={elections} />}/>
-            <Route path={"/candidates/"} element={<CandidateTable value={candidates}/>}/>
+            <Route path={"/"} element={<ElectionTable
+                elections={elections}
+                candidates={candidates}/>}/>
+            <Route path={"/candidates/"} element={<CandidateTable
+                value={candidates}/>}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
             <Route path={"/archive/"} element={"This is the archive page"}/>
             <Route path={"/result/"} element={"This is the result page"}/>

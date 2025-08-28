@@ -51,3 +51,39 @@ div.navigation-item > p {
 div.navigation-item > img {
   padding: 4px;
 }
+
+div.small-card-candidate{
+  display: flex;
+  flex-direction: row;
+  flex-basis: auto;
+  border-radius: 7px;
+  align-items:baseline;
+  background-color: #535bf2;
+  margin: 2px;
+}
+
+span.small-card-candidate{
+  flex: 1 1 0;
+  font-size: 12px;
+  display: inline;
+  border-radius: 5px;
+  white-space: nowrap;
+  margin: 2px;
+  padding: 0 2px;
+  background-color: rgba(255,255,255,.7);
+}
+
+button.small-card-candidate{
+  flex: 0 0 18px;
+  font-size: 12px;
+  font-weight: bold;
+  height: 18px;
+  width: 18px;
+  border-radius: 5px;
+  padding: 0;
+  border-spacing: 0;
+  margin: 2px 2px 2px 0;
+  text-align: center;
+  color: #fff;
+  background-color: #444;
+}
