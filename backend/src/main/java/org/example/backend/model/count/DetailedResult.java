@@ -1,15 +1,16 @@
 package org.example.backend.model.count;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.Locale;
 
 public class DetailedResult {
     private final ArrayList<String> electedCandidateIDs = new ArrayList<>();
     private final ArrayList<String> excludedCandidateIDs = new ArrayList<>();
     private final HashMap<String,ArrayList<String>> voteCounts = new HashMap<>();
-    private static final DecimalFormat PERCENT = new DecimalFormat("0.00");
+    private static final DecimalFormat PERCENT = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.UK));
 
     private void recordVoteCount(Candidate candidate, double votes) {
         ArrayList<String> voteList = voteCounts.computeIfAbsent(candidate.getDbCandidate().id(), k -> new ArrayList<>());

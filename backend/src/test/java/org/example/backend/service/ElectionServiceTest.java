@@ -8,21 +8,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class ElectionServiceTest {
-
-    @Test
-    void getAllElections() {
-        // GIVEN
-        ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
-        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
-        Election election = new Election(
+    private Election getDefaultElection() {
+        return new Election(
                 "1",
                 "MyElection",
                 "some details",
@@ -32,6 +26,15 @@ class ElectionServiceTest {
                 Election.ElectionType.STV,
                 "Person",
                 3);
+    }
+
+    @Test
+    void getAllElections() {
+        // GIVEN
+        ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
+        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        Election election = getDefaultElection();
 
         // WHEN
         when(electionRepo.findAll()).thenReturn(java.util.List.of(election));
@@ -51,16 +54,8 @@ class ElectionServiceTest {
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
         ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
-        Election election = new Election(
-                "1",
-                "MyElection",
-                "some details",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Election.ElectionState.OPEN,
-                Election.ElectionType.STV,
-                "Person",
-                3);
+        Election election = getDefaultElection();
+
         //WHEN
         when(electionRepo.save(election)).thenReturn(election);
         Election result = electionService.createElection(election);
@@ -74,7 +69,7 @@ class ElectionServiceTest {
 
     @Test
     void getAllCandidates() {
-        // given
+        //GIVEN
 
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
@@ -87,15 +82,34 @@ class ElectionServiceTest {
                 "some details",
                 "Person");
 
-        // when
+        //WHEN
         when(candidateRepo.findAll()).thenReturn(java.util.List.of(candidate));
         java.util.List<Candidate> result = electionService.getAllCandidates();
 
-        // then
+        //THEN
         assertThat(result)
                 .hasSize(1)
                 .containsExactly(candidate);
         verify(candidateRepo, times(1)).findAll();
         verifyNoMoreInteractions(candidateRepo);
+    }
+
+    @Test
+    void getElectionById() {
+        //GIVEN
+        ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
+        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        Election election = getDefaultElection();
+
+        //WHEN
+        when(electionRepo.findById("1")).thenReturn(Optional.of(election));
+        when(electionRepo.findById("2")).thenReturn(null);
+        Optional<Election> result1 = electionService.getElectionById("1");
+        Optional<Election> result2 = electionService.getElectionById("2");
+
+        //THEN
+        assertThat(result1.get()).isEqualTo(election);
+        assertThat(result2).isEqualTo(null);
     }
 }

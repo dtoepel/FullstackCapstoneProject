@@ -1,6 +1,7 @@
 package org.example.backend.model.count;
 
 import org.example.backend.model.db.Candidate;
+import org.example.backend.model.db.Election;
 import org.example.backend.model.db.Vote;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,7 @@ class MeekAlgorithmTest {
         candidates.add(new Candidate("D", "David", "", "", "", ""));
         candidates.add(new Candidate("E", "Eve", "", "", "", ""));
         return candidates;
-    };
+    }
 
     @Test
     void performElection() {
@@ -41,7 +42,40 @@ class MeekAlgorithmTest {
             if(Arrays.asList("A", "B").contains(item.candidateID())) assertEquals("ELECTED", item.votes().getLast());
             if(Arrays.asList("C", "D", "E").contains(item.candidateID())) assertEquals("EXCLUDED", item.votes().getLast());
         }
-
     }
+
+    @Test
+    void performElectionWithCountService() {
+        //GIVEN
+        ArrayList<Vote> votes = new ArrayList<>();
+        for(int i = 0; i < 6; i++) votes.add(new Vote(List.of("A")));
+        for(int i = 0; i < 5; i++) votes.add(new Vote(List.of("B")));
+        for(int i = 0; i < 2; i++) votes.add(new Vote(Arrays.asList("C", "B")));
+        Election election = new Election(
+                "any", "any", "any",
+                Arrays.asList("A", "B", "C"),
+                votes,
+                Election.ElectionState.CLOSED,
+                Election.ElectionType.STV,
+                "any",
+                1);
+
+        ArrayList<Candidate> allCandidates = getDefaultCandidates();
+
+        //WHEN
+        List<DetailedResult.ResultItem> result = CountService.getElectionResult(election, allCandidates);
+
+        //THEN
+        assertEquals(3, result.size());
+        for(DetailedResult.ResultItem item : result) {
+            assertTrue(item.votes().getLast().equals("ELECTED") || item.votes().getLast().equals("EXCLUDED"));
+            if("B".equals(item.candidateID())) {
+                assertEquals("38.46%", item.votes().getFirst());
+                assertEquals("ELECTED", item.votes().getLast());
+            }
+            if(Arrays.asList("A", "C").contains(item.candidateID())) assertEquals("EXCLUDED", item.votes().getLast());
+        }
+    }
+
 
 }

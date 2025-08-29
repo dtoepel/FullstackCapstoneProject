@@ -11,16 +11,16 @@ public class CountService {
 
     public static List<DetailedResult.ResultItem> getElectionResult(
             Election election,
-            List<Candidate> candidatesDB) {
-        ArrayList<Candidate> candidates = new ArrayList<>();
+            List<Candidate> allCandidates) {
+        ArrayList<Candidate> runningCandidates = new ArrayList<>();
         for(String eId : election.candidateIDs()) {
-            for(Candidate cc : candidatesDB) {
+            for(Candidate cc : allCandidates) {
                 if(cc.id().equals(eId)) {
-                    candidates.add(cc);
+                    runningCandidates.add(cc);
                 }
             }
         }
-        MeekAlgorithm meek = new MeekAlgorithm(candidates, election.votes(), election.seats());
+        MeekAlgorithm meek = new MeekAlgorithm(runningCandidates, election.votes(), election.seats());
         DetailedResult result = meek.perform();
         return result.get();
     }

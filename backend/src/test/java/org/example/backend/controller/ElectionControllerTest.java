@@ -1,6 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.model.db.Candidate;
+import org.example.backend.model.db.Vote;
 import org.example.backend.repository.CandidateRepo;
 import org.junit.jupiter.api.Test;
 import org.example.backend.model.db.Election;
@@ -14,7 +15,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
-import java.util.Vector;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -264,6 +266,47 @@ public class ElectionControllerTest {
                                 ]
                                 """))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
+
+    }
+
+    @Test
+    void getElectionResults() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "myID",
+                "any",
+                "any",
+                Arrays.asList("A", "B"),
+                List.of(new Vote(List.of("A"))),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "any",
+                1);
+        electionRepo.save(existingElection);
+        candidateRepo.save(new Candidate("A", "Alice", "", "", "", ""));
+        candidateRepo.save(new Candidate("B", "Bob", "", "", "", ""));
+        candidateRepo.save(new Candidate("C", "Charlie", "", "", "", ""));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[:1].candidateID").value("A"));
+
+
+    }
+
+    @Test
+    void getElectionResults404() throws Exception {
+        //GIVEN
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.reason));
 
     }
 }

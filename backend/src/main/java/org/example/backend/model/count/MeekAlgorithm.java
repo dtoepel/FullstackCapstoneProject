@@ -1,9 +1,8 @@
 package org.example.backend.model.count;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.example.backend.model.count.Candidate.CandidateStatus.*;
 
@@ -12,8 +11,6 @@ public class MeekAlgorithm {
     private final ArrayList<Candidate> candidates;
     private final ArrayList<org.example.backend.model.count.Vote> votes;
     private final int seats;
-
-    private final HashMap<org.example.backend.model.db.Candidate, Integer> firstVotes;
 
     /**
      * Inits the Algorithm with a list of candidates and a list of votes cast.
@@ -26,23 +23,14 @@ public class MeekAlgorithm {
      * @param seats      The number of seats to be awarded
      */
     public MeekAlgorithm(ArrayList<org.example.backend.model.db.Candidate> candidates,
-                         ArrayList<org.example.backend.model.db.Vote> votes, int seats) {
+                         List<org.example.backend.model.db.Vote> votes, int seats) {
         this.candidates = new ArrayList<>();
-        this.firstVotes = new HashMap<>();
         for (org.example.backend.model.db.Candidate c : candidates) {
             this.candidates.add(new Candidate(c));
-            this.firstVotes.put(c, 0);
         }
         this.votes = new ArrayList<>();
         for (org.example.backend.model.db.Vote v : votes) {
             this.votes.add(new Vote(v, this.candidates, 1.));
-            if (!v.rankingIDs().isEmpty()) {
-                for (org.example.backend.model.db.Candidate c : candidates) {
-                    if (c.id().equals(v.rankingIDs().getFirst())) {
-                        this.firstVotes.put(c, this.firstVotes.get(c) + 1);
-                    }
-                }
-            }
         }
         this.seats = seats;
     }
