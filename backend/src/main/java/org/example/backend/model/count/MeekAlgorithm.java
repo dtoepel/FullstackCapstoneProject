@@ -22,7 +22,7 @@ public class MeekAlgorithm {
      * @param votes      The votes cast
      * @param seats      The number of seats to be awarded
      */
-    public MeekAlgorithm(ArrayList<org.example.backend.model.db.Candidate> candidates,
+    public MeekAlgorithm(List<org.example.backend.model.db.Candidate> candidates,
                          List<org.example.backend.model.db.Vote> votes, int seats) {
         this.candidates = new ArrayList<>();
         for (org.example.backend.model.db.Candidate c : candidates) {

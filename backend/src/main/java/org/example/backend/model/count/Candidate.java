@@ -10,7 +10,7 @@ class Candidate {
 
     public Candidate(org.example.backend.model.db.Candidate dbCandidate) {
         this.dbCandidate = dbCandidate;
-        this.random = Math.random();
+        this.random = 1. * dbCandidate.name().hashCode() / Integer.MAX_VALUE;
     }
 
     public void setStatus(CandidateStatus status) {

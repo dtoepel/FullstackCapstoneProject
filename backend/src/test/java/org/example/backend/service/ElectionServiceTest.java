@@ -109,7 +109,7 @@ class ElectionServiceTest {
         Optional<Election> result2 = electionService.getElectionById("2");
 
         //THEN
-        assertThat(result1.get()).isEqualTo(election);
-        assertThat(result2).isEqualTo(null);
+        assertThat(result1).contains(election);
+        assertThat(result2).isNull();
     }
 }

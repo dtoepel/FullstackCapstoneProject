@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class DetailedResult {
@@ -37,9 +38,9 @@ public class DetailedResult {
     void recordElectedCandidate(Candidate candidate) {electedCandidateIDs.add(candidate.getDbCandidate().id());}
     void recordExcludedCandidate(Candidate candidate) {excludedCandidateIDs.add(candidate.getDbCandidate().id());}
 
-    public record ResultItem(String candidateID, ArrayList<String> votes) {}
+    public record ResultItem(String candidateID, List<String> votes) {}
 
-    public ArrayList<ResultItem> get() {
+    public List<ResultItem> get() {
         ArrayList<ResultItem> items = new ArrayList<>();
         for(String candidateID : electedCandidateIDs) {
             items.add(new ResultItem(candidateID, voteCounts.getOrDefault(candidateID, new ArrayList<>())));
