@@ -51,11 +51,13 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                                     <>
                                         <button onClick={() => props.onEditElection(election)}>Edit</button>
                                         <button><s>Open Voting</s></button>
+                                        <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                                     </>
                                 :election.electionState === "VOTING"?
                                     <>
                                         <button><s>Close Voting</s></button>
                                         <button><s>Vote</s></button>
+                                        <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                                     </>
                                 :election.electionState === "CLOSED"?
                                     <>

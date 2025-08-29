@@ -7,7 +7,7 @@ import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
 
-import type {Candidate, Election, Vote} from "./ElectionData.ts";
+import type {Candidate, Election, STVResultItem, Vote} from "./ElectionData.ts";
 
 import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
@@ -19,6 +19,7 @@ import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import AddVoteForm from "./AddVoteForm.tsx";
+import ResultTable from "./ResultTable.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -70,6 +71,7 @@ function App() {
 
     const [currentElection, setCurrentElection] = useState<Election|null>(null);
     const [newVote, setNewVote] = useState<Vote>(defaultVote)
+    const [result, setResult] = useState<STVResultItem[]>([])
 
     // only place to update data
     // could be split to reduce traffic by a small amount
@@ -160,6 +162,8 @@ function App() {
         axios.get("/api/election/results/" + election.id).then(
             (response) => {
                 console.log(response.data)
+                setResult(response.data)
+                nav("/result/")
             }
         )
     }
@@ -306,7 +310,9 @@ function App() {
                     onCreateElection={() => {}}
                     onEditElection={() => {}}
             />}/>
-            <Route path={"/result/"} element={"This is the result page"}/>
+            <Route path={"/result/"} element={<ResultTable
+            result={result}
+            allCandidates={candidates}/>}/>
         </Routes>
     </div>
   )

@@ -30,3 +30,8 @@ export type ElectionResultItem = {
     elected:boolean;
     electedAs:string;
 }
+
+export type STVResultItem = {
+    candidateID:string;
+    votes:string[];
+}

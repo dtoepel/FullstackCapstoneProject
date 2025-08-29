@@ -1,0 +1,44 @@
+import type {Candidate, STVResultItem} from "./ElectionData.ts";
+
+export type ResultTableProps = {
+    result:STVResultItem[];
+    allCandidates:Candidate[];
+}
+
+export default function ResultTable(props:Readonly<ResultTableProps>) {
+    const firstLineU:STVResultItem|undefined = props.result.at(0);
+    const firstLine:STVResultItem = firstLineU===undefined?{candidateID:"",votes:[]}:firstLineU;
+
+    return(
+        <div style={{overflow:"scroll", height:"400px", width:"95vw"}}>
+        <table border={1}>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th style={{width:"10px"}}>&nbsp;</th>
+                    <th>Candidate</th>
+                    {firstLine.votes.map((_x, i) => {return(<th>Count {i+1}</th>)})}
+                </tr>
+            </thead>
+            <tbody>
+            {props.result.map((item, y) => {
+                const candidateU:Candidate|undefined = props.allCandidates.filter(c => c.id === item.candidateID).at(0);
+                const candidate:Candidate = candidateU===undefined?
+                    {name:"Candidate not found",id:"",type:"",archived:false,party:"",color:"",description:""}
+                    :candidateU;
+              return (
+                  <tr>
+                      <th>{y+1}</th>
+                      <th style={{backgroundColor:"#"+candidate.color}}>&nbsp;</th>
+                      <th>{candidate.name}</th>
+                      {item.votes.map(votes => {return(
+                          votes==="ELECTED"?<td style={{backgroundColor:"#6b9"}}>★</td>:votes==="EXCLUDED"?<td style={{backgroundColor:"#f8c"}}>☓</td>:<td>{votes}</td>
+
+                      )})}
+                  </tr>
+              )})}
+            </tbody>
+        </table>
+        </div>
+    )
+}
