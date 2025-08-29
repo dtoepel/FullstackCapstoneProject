@@ -15,7 +15,7 @@ public record Election(
         String candidateType,
         int seats) {
 
-    public enum ElectionState {OPEN, VOTING, CLOSED}
+    public enum ElectionState {OPEN, VOTING, CLOSED, ARCHIVED}
     public enum ElectionType {STV, VICE}
 
     @ResponseStatus(value= HttpStatus.FORBIDDEN, reason=DuplicateIdException.reason)

@@ -80,7 +80,8 @@ class ElectionServiceTest {
                 "Independent",
                 "#444",
                 "some details",
-                "Person");
+                "Person",
+                false);
 
         //WHEN
         when(candidateRepo.findAll()).thenReturn(java.util.List.of(candidate));
@@ -107,7 +108,8 @@ class ElectionServiceTest {
                 "Independent",
                 "#444",
                 "some details",
-                "Person");
+                "Person",
+                false);
 
         //WHEN
         when(candidateRepo.save(candidate)).thenReturn(candidate);

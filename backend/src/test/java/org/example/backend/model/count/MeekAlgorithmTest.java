@@ -15,11 +15,11 @@ class MeekAlgorithmTest {
 
     private ArrayList<Candidate> getDefaultCandidates() {
         ArrayList<Candidate> candidates = new ArrayList<>();
-        candidates.add(new Candidate("A", "Alice", "", "", "", ""));
-        candidates.add(new Candidate("B", "Bob", "", "", "", ""));
-        candidates.add(new Candidate("C", "Charlie", "", "", "", ""));
-        candidates.add(new Candidate("D", "David", "", "", "", ""));
-        candidates.add(new Candidate("E", "Eve", "", "", "", ""));
+        candidates.add(new Candidate("A", "Alice", "", "", "", "", false));
+        candidates.add(new Candidate("B", "Bob", "", "", "", "", false));
+        candidates.add(new Candidate("C", "Charlie", "", "", "", "", false));
+        candidates.add(new Candidate("D", "David", "", "", "", "", false));
+        candidates.add(new Candidate("E", "Eve", "", "", "", "", false));
         return candidates;
     }
 
