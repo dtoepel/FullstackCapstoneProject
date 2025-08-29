@@ -1,7 +1,9 @@
-import type {Election} from "./ElectionData.ts";
+import type {Candidate, Election} from "./ElectionData.ts";
+import CandidateBox from "./CandidateBox.tsx";
 
 export type ElectionTableProps = {
-    value:Election[];
+    elections:Election[];
+    candidates:Candidate[];
     onCreateElection:()=>void;
     onEditElection:(election:Election)=>void;
     onGetResult:(election:Election)=>void;
@@ -23,7 +25,12 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                 </tr>
                 </thead>
                 <tbody>
-                {props.value.map((election) => {
+                {props.elections.map((election) => {
+                    let candidates:Candidate[] = [];
+                    election.candidateIDs.forEach((id) => {
+                        candidates = candidates.concat(props.candidates.filter(
+                            candidate => candidate.id == id))
+                    });
 
                     return(
                         <tr key={election.id}>
@@ -31,7 +38,11 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                             <td>{election.name}</td>
                             <td>{election.electionState}</td>
                             <td>{election.description}</td>
-                            <td>TBD</td>
+                            <td><div style={{display:"flex", flexDirection:"row", flexWrap:"wrap"}}>
+                                {candidates.map(candidate => {return(
+                                    <CandidateBox candidate={candidate}/>
+                                )})}
+                            </div></td>
                             <td>
                                 <button onClick={() => props.onEditElection(election)}>Edit</button>
                                 <button onClick={() => props.onGetResult(election)}>Result</button>

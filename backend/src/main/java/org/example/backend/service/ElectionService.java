@@ -26,5 +26,7 @@ public class ElectionService {
     public Optional<Election> getElectionById(String id) { return electionRepo.findById(id); }
 
     public List<Candidate> getAllCandidates() { return candidateRepo.findAll(); }
+    public Candidate createCandidate(Candidate candidate) { return candidateRepo.save(candidate); }
+    public Candidate updateCandidate(Candidate candidate) { return candidateRepo.save(candidate); }
 
 }

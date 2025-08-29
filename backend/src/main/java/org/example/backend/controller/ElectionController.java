@@ -3,6 +3,7 @@ package org.example.backend.controller;
 import org.example.backend.model.count.CountService;
 import org.example.backend.model.count.DetailedResult;
 import org.example.backend.model.db.Candidate;
+import org.example.backend.model.db.CandidateDTO;
 import org.example.backend.model.db.Election;
 import org.example.backend.model.db.ElectionDTO;
 import org.example.backend.service.ElectionService;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.Optional;
 
 @RestController
@@ -75,4 +78,27 @@ public class ElectionController {
 
     @GetMapping("/candidates")
     public List<Candidate> getAllCandidates() { return electionService.getAllCandidates(); }
+
+
+    @PostMapping("/candidates")
+    public ResponseEntity<Candidate> createCandidate(@RequestBody CandidateDTO init) {
+        UUID uuid = UUID.randomUUID();
+
+        return new ResponseEntity<>(
+                electionService.createCandidate(new Candidate(
+                        init, uuid.toString())),
+                HttpStatus.CREATED);
+    }
+
+    @PutMapping("/candidates")
+    public ResponseEntity<Candidate> updateCandidate(@RequestBody Candidate candidate) {
+        List<Candidate> allCandidates = electionService.getAllCandidates();
+        if(allCandidates.stream().filter(candidateDB -> candidateDB.id().equals(candidate.id())).toList().isEmpty()) {
+            throw new Candidate.IdNotFoundException();
+        } else {
+            return new ResponseEntity<>(
+                    electionService.updateCandidate(candidate),
+                    HttpStatus.ACCEPTED);
+        }
+    }
 }
