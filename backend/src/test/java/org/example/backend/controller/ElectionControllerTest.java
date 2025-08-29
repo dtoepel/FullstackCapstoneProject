@@ -247,6 +247,7 @@ public class ElectionControllerTest {
                 "#444",
                 "some details",
                 "Person");
+        candidateRepo.deleteAll();
         candidateRepo.save(candidate);
 
         //WHEN
@@ -300,6 +301,7 @@ public class ElectionControllerTest {
     @Test
     void getElectionResults404() throws Exception {
         //GIVEN
+        electionRepo.deleteAll();
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
