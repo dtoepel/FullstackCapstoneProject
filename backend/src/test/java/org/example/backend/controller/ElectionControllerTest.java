@@ -244,6 +244,7 @@ public class ElectionControllerTest {
                 "#444",
                 "some details",
                 "Person");
+        candidateRepo.deleteAll();
         candidateRepo.save(candidate);
 
         //WHEN
@@ -264,5 +265,106 @@ public class ElectionControllerTest {
                                 """))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
 
+    }
+
+    @Test
+    void createCandidateSuccess() throws Exception {
+        //GIVEN
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/candidates")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name": "John Doe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#444",
+                                    "type": "Person"
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().json(
+                        """ 
+                                {
+                                    "name": "John Doe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#444",
+                                    "type": "Person"
+                                }
+                                """))
+                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty());
+    }
+
+    @Test
+    void updateCandidateSuccess() throws Exception {
+        //GIVEN
+        Candidate existingCandidate = new Candidate(
+                "1",
+                "John Doe",
+                "Independent",
+                "#444",
+                "some details",
+                "Person");
+        candidateRepo.save(existingCandidate);
+        //WHEN
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "1",
+                                    "name": "Don Joe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#555",
+                                    "type": "Person"
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isAccepted())
+                .andExpect(MockMvcResultMatchers.content().json(
+                        """ 
+                                {
+                                    "id": "1",
+                                    "name": "Don Joe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#555",
+                                    "type": "Person"
+                                }
+                                """));
+    }
+
+    @Test
+    void updateCandidateNotFound() throws Exception {
+        //GIVEN
+        Candidate existingCandidate = new Candidate(
+                "1",
+                "John Doe",
+                "Independent",
+                "#444",
+                "some details",
+                "Person");
+        candidateRepo.save(existingCandidate);
+        //WHEN
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "2",
+                                    "name": "Don Joe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#555",
+                                    "type": "Person"
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Candidate.IdNotFoundException.reason));
     }
 }

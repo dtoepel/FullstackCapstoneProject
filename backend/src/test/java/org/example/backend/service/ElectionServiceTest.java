@@ -97,4 +97,31 @@ class ElectionServiceTest {
         verify(candidateRepo, times(1)).findAll();
         verifyNoMoreInteractions(candidateRepo);
     }
+
+
+    @Test
+    void createCandidate() {
+        //GIVEN
+        ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
+        CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        Candidate candidate = new Candidate(
+                "-1",
+                "John Doe",
+                "Independent",
+                "#444",
+                "some details",
+                "Person");
+
+        //WHEN
+        when(candidateRepo.save(candidate)).thenReturn(candidate);
+        Candidate result = electionService.createCandidate(candidate);
+
+        //THEN
+        assertThat(result)
+                .isEqualTo(candidate);
+        verify(candidateRepo, times(1)).save(candidate);
+        verifyNoMoreInteractions(electionRepo);
+    }
+
 }

@@ -3,6 +3,8 @@ import {type ChangeEvent, useState} from "react";
 
 export type CandidateTableProps = {
     value:Candidate[];
+    onCreateCandidate:()=>void;
+    onEditCandidate:(candidate:Candidate)=>void;
 }
 
 function getAllTypes(candidates : Candidate[]):string[] {
@@ -39,12 +41,12 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                         <option value={type}>{type}</option>
                     )})}
                 </select>
+                <button onClick={() => props.onCreateCandidate()}>Create</button>
             </div>
 
             <table border={1}>
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Party</th>
                     <th>Info</th>
@@ -58,12 +60,15 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                     .map((candidate) => {
                     return (
                         <tr>
-                            <td>{candidate.id}</td>
                             <td>{candidate.name}</td>
                             <td>{candidate.party}</td>
                             <td>{candidate.description}</td>
                             <td>{candidate.type}</td>
-                            <td>TBD</td>
+                            <td>
+                                <button onClick={() => props.onEditCandidate(candidate)}>Edit</button>
+                                <button><s>Retire</s></button>
+                                <button><s>Delete</s></button>
+                            </td>
                         </tr>
                     )
                 })}

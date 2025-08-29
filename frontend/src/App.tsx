@@ -13,6 +13,7 @@ import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
 import CandidateTable from "./CandidateTable.tsx";
 import ElectionForm from "./ElectionForm.tsx";
+import CandidateForm from "./CandidateForm.tsx";
 
 import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
@@ -30,6 +31,11 @@ function App() {
         name:"new Election",id:"ABC00",candidateIDs:[],votes:[],electionState:"OPEN",
         description:"Enter description here...",seats:1,electionMethod:"STV",candidateType:"Person"
     };
+    const defaultCandidate:Candidate = {
+        id:"(automatically assigned)", name:"John Doe",
+        description:"an average candidate",
+        party:"Independent", color:"888", type:"Person"
+    };
 
     // temporary variables for forms
     type EditElectionProps = {
@@ -39,8 +45,21 @@ function App() {
         onSuccess:()=>void;
     }
 
+    type EditCandidateProps = {
+        candidate:Candidate
+        editMode:boolean;
+        error:string|null;
+        onSuccess:()=>void;
+    }
+
     const [editElectionProps, setEditElectionProps] = useState<EditElectionProps>({
         election:defaultElection,
+        editMode:false,
+        error:null,
+        onSuccess:()=>{}});
+
+    const [editCandidateProps, setEditCandidateProps] = useState<EditCandidateProps>({
+        candidate:defaultCandidate,
         editMode:false,
         error:null,
         onSuccess:()=>{}});
@@ -86,6 +105,30 @@ function App() {
                 console.log(error);
                 if(error.response && error.response.status == 404) {
                     setEditElectionProps({...editElectionProps, error:error.response.data.message})
+                }
+            })
+    }
+
+    function createCandidate(candidate:Candidate):void {
+        axios.post("/api/election/candidates", candidate)
+            .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
+            .catch(error => {
+                console.log(error);
+                console.log(error.status);
+                if(error.status == 403) {
+                    console.log(error.response.data.message);
+                    setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
+                }
+            })
+    }
+
+    function updateCandidate(candidate:Candidate) {
+        axios.put("/api/election/candidates", candidate)
+            .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
+            .catch(error => {
+                console.log(error);
+                if(error.response && error.response.status == 404) {
+                    setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
                 }
             })
     }
@@ -185,7 +228,40 @@ function App() {
                 onSubmit={() => updateElection(editElectionProps.election)}
             />}/>
             <Route path={"/candidates/"} element={<CandidateTable
-                value={candidates}/>}/>
+                value={candidates}
+                onCreateCandidate={() => {
+                    setEditCandidateProps({
+                        candidate:defaultCandidate,
+                        editMode:false,
+                        error:null,
+                        onSuccess:() => nav("/candidates/")
+                    });
+                    nav("/createCandidate/")
+                }}
+                onEditCandidate={(candidate) => {
+                    setEditCandidateProps({
+                        candidate:candidate,
+                        editMode:true,
+                        error:null,
+                        onSuccess:() => nav("/candidates/")
+                    })
+                    nav("/editCandidate/")
+                }}
+            />}/>
+            <Route path={"/createCandidate/"} element={<CandidateForm
+                candidate={editCandidateProps.candidate}
+                editMode={editCandidateProps.editMode}
+                error={editCandidateProps.error}
+                onEdit={(candidate) => setEditCandidateProps({...editCandidateProps, candidate:candidate})}
+                onSubmit={() => createCandidate(editCandidateProps.candidate)}
+            />}/>
+            <Route path={"/editCandidate/"} element={<CandidateForm
+                candidate={editCandidateProps.candidate}
+                editMode={editCandidateProps.editMode}
+                error={editCandidateProps.error}
+                onEdit={(candidate) => setEditCandidateProps({...editCandidateProps, candidate:candidate})}
+                onSubmit={() => updateCandidate(editCandidateProps.candidate)}
+            />}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
             <Route path={"/archive/"} element={"This is the archive page"}/>
             <Route path={"/result/"} element={"This is the result page"}/>
