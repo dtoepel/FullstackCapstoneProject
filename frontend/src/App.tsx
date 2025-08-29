@@ -13,11 +13,11 @@ import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
 import CandidateTable from "./CandidateTable.tsx";
 import ElectionForm from "./ElectionForm.tsx";
+import CandidateForm from "./CandidateForm.tsx";
 
 import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import CandidateForm from "./CandidateForm.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -190,7 +190,8 @@ function App() {
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
             <Route path={"/"} element={<ElectionTable
-                value={elections}
+                elections={elections}
+                candidates={candidates}
                 onCreateElection={() => {
                     setEditElectionProps({
                         election:defaultElection,
