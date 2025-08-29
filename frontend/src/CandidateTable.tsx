@@ -59,7 +59,7 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                     .filter(candidate => {return typeFilter===null || typeFilter===candidate.type})
                     .map((candidate) => {
                     return (
-                        <tr>
+                        <tr key={candidate.id}>
                             <td>{candidate.name}</td>
                             <td>{candidate.party}</td>
                             <td>{candidate.description}</td>
