@@ -147,7 +147,8 @@ function App() {
         <h3>User: {user === undefined ? "undefined" : user === null ? "null" : user}</h3>
         <Routes>
             <Route path={"/"} element={<ElectionTable
-                value={elections}
+                elections={elections}
+                candidates={candidates}
                 onCreateElection={() => {
                     setEditElectionProps({
                         election:defaultElection,
@@ -183,7 +184,8 @@ function App() {
                 onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
                 onSubmit={() => updateElection(editElectionProps.election)}
             />}/>
-            <Route path={"/candidates/"} element={<CandidateTable value={candidates}/>}/>
+            <Route path={"/candidates/"} element={<CandidateTable
+                value={candidates}/>}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
             <Route path={"/archive/"} element={"This is the archive page"}/>
             <Route path={"/result/"} element={"This is the result page"}/>
