@@ -84,57 +84,49 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
     }
     ballotNo = ballotNo.substring(0,2)+"-"+ ballotNo.substring(2,3)+"-"+ ballotNo.substring(3,5)
 
-    return(
-            <table border={1}>
-                <tbody>
-                <tr>
-                    <td>
-                        <select id={"selectElection"} onChange={electionChanged}>
-                            {props.allElections.map(election => {
-                                return( <option value={election.id} key={election.id}>{election.name}</option>
-                            )})}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colSpan={2}>Ballot No. {ballotNo}</td>
-                </tr>
-                <tr>
-                    <td>
-                        ranked Candidates
-                    </td>
-                    <td><div style={{
-                        display:"flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start"}}>{ranked.map((candidate, index, array) => {return (
+    return(<>
+            <select id={"selectElection"} onChange={electionChanged}>
+            {props.allElections.map(election => {
+                return( <option value={election.id} key={election.id}>{election.name}</option>
+                )})}
+            </select>
+            <div className={"ballot"} style={{maxWidth:"500px"}}>
+                <p style={{fontWeight:"bold",fontSize:"48px",color:"var(--mydarkblue)"}}>Ballot</p>
+                <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>No. {ballotNo}</p>
+                    <p style={{fontWeight:"bold",fontSize:"12px",color:"#fff"}}>for the</p>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>{props.election?props.election.name:"(Election not selected!)"}</p>
+                </div>
+                <div className={"ballot-item"} style={{flexDirection:"row"}}>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"var(--mydarkblue)"}}>Vaildation Code:</p>
+                    <input/>
+                </div>
+                <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>Ranked Candidates:</p>
+                    <div style={{display:"flex", flexDirection:"column"}}>
+                        {ranked.map((candidate, index, array) => {return (
                             <CandidateBox key={candidate.id}
-                                candidate={candidate}
-                                onDelete={() => {voteRemove(candidate)}}
-                                onUp={() => {voteUp(candidate)}}
-                                onDown={() => {voteDown(candidate)}}
-                                deleteAvailable={true}
-                                upAvailable={index > 0}
-                                downAvailable={index < array.length-1}
-                                rank={index+1}/>
-                    )})}</div></td>
-                </tr>
-                <tr>
-                    <td>
-                        Unranked Candidates
-                    </td>
-                    <td><div style={{
-                    display:"flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start"}}>{unranked.map((candidate) => {return (
-                        <CandidateBox key={candidate.id} candidate={candidate} addAvailable={true} onAdd={() => {voteAdd(candidate)}}/>
-                )})}</div></td>
-                </tr>
-                <tr>
-                    <td colSpan={2}>
-                        <form onClick={(e)=>submit(e)}><button>Submit</button></form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                                          candidate={candidate}
+                                          onDelete={() => {voteRemove(candidate)}}
+                                          onUp={() => {voteUp(candidate)}}
+                                          onDown={() => {voteDown(candidate)}}
+                                          deleteAvailable={true}
+                                          upAvailable={index > 0}
+                                          downAvailable={index < array.length-1}
+                                          rank={index+1}/>
+                        )})}
+                    </div>
+                </div>
+                <div className={"ballot-item"} style={{flexDirection:"column"}}>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"var(--mydarkblue)"}}>Unranked Candidates:</p>
+                    <div style={{display:"flex", flexDirection:"row",flexWrap:"wrap",alignContent:"flex-start"}}>
+                        {unranked.map((candidate) => {return (
+                            <CandidateBox key={candidate.id} candidate={candidate} addAvailable={true} onAdd={() => {voteAdd(candidate)}}/>
+                        )})}
+                    </div>
+                </div>
+                <form onClick={(e)=>submit(e)}><button>Submit</button></form>
+            </div>
+        </>
     )
 }

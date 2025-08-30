@@ -5,6 +5,7 @@
   text-align: center;
 
   --myblue:#48f;
+  --mydarkblue:#248;
   --mygreen:#385;
   --myred:#c68;
   --mydarkgray:#888;
@@ -94,4 +95,27 @@ button.small-card-candidate{
   text-align: center;
   color: #fff;
   background-color: #444;
+}
+
+div.ballot {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--myblue);
+  border-radius: 16px;
+  padding: 4px;
+}
+
+div.ballot-item {
+  display: flex;
+  border-radius: 12px;
+  padding: 4px;
+  justify-content: center;
+}
+
+div.ballot > p {
+  margin: 0;
+}
+
+div.ballot-item  > p {
+  margin: 0;
 }
