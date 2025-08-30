@@ -1,11 +1,11 @@
 package org.example.backend.model.db;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public record ElectionDTO(
         String id, String name, String description,
-          Vector<String> candidateIDs,
-          Election.ElectionType electionMethod,
-          String candidateType,
-          int seats) {
+        ArrayList<String> candidateIDs,
+        Election.ElectionType electionMethod,
+        String candidateType,
+        int seats) {
 }

@@ -7,6 +7,7 @@ import org.example.backend.repository.ElectionRepo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ElectionService {
@@ -21,6 +22,8 @@ public class ElectionService {
     public List<Election> getAllElections() { return electionRepo.findAll(); }
     public Election createElection(Election election) { return electionRepo.save(election); }
     public Election updateElection(Election election) { return electionRepo.save(election); }
+
+    public Optional<Election> getElectionById(String id) { return electionRepo.findById(id); }
 
     public List<Candidate> getAllCandidates() { return candidateRepo.findAll(); }
     public Candidate createCandidate(Candidate candidate) { return candidateRepo.save(candidate); }

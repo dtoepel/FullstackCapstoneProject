@@ -26,7 +26,7 @@ function App() {
     const [elections, setElections] = useState<Election[]>([]);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
 
-    // default values for froms
+    // default values for forms
     const defaultElection:Election = {
         name:"new Election",id:"ABC00",candidateIDs:[],votes:[],electionState:"OPEN",
         description:"Enter description here...",seats:1,electionMethod:"STV",candidateType:"Person"
@@ -154,6 +154,14 @@ function App() {
         window.open(host + '/logout', '_self')
     }
 
+    function getElectionResults(election:Election):void {
+        axios.get("/api/election/results/" + election.id).then(
+            (response) => {
+                console.log(response.data)
+            }
+        )
+    }
+
     useEffect(() => {
         loadUser();
     }, []);
@@ -192,6 +200,7 @@ function App() {
             <Route path={"/"} element={<ElectionTable
                 elections={elections}
                 candidates={candidates}
+                onGetResult={getElectionResults}
                 onCreateElection={() => {
                     setEditElectionProps({
                         election:defaultElection,

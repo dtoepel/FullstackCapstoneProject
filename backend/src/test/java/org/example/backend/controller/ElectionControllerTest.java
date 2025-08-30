@@ -1,6 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.model.db.Candidate;
+import org.example.backend.model.db.Vote;
 import org.example.backend.repository.CandidateRepo;
 import org.junit.jupiter.api.Test;
 import org.example.backend.model.db.Election;
@@ -13,7 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -35,8 +38,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -73,8 +76,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -120,8 +123,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -155,8 +158,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -204,8 +207,8 @@ public class ElectionControllerTest {
                 "1",
                 "MyElection",
                 "some details",
-                new Vector<>(),
-                new Vector<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -366,5 +369,47 @@ public class ElectionControllerTest {
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.status().reason(Candidate.IdNotFoundException.reason));
+    }
+
+    @Test
+    void getElectionResults() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "myID",
+                "any",
+                "any",
+                Arrays.asList("A", "B"),
+                List.of(new Vote(List.of("A"))),
+                Election.ElectionState.OPEN,
+                Election.ElectionType.STV,
+                "any",
+                1);
+        electionRepo.save(existingElection);
+        candidateRepo.save(new Candidate("A", "Alice", "", "", "", ""));
+        candidateRepo.save(new Candidate("B", "Bob", "", "", "", ""));
+        candidateRepo.save(new Candidate("C", "Charlie", "", "", "", ""));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$[:1].candidateID").value("A"));
+
+
+    }
+
+    @Test
+    void getElectionResults404() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.reason));
+
     }
 }

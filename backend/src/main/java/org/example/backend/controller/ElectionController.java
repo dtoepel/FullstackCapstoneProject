@@ -1,5 +1,7 @@
 package org.example.backend.controller;
 
+import org.example.backend.model.count.CountService;
+import org.example.backend.model.count.DetailedResult;
 import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.CandidateDTO;
 import org.example.backend.model.db.Election;
@@ -9,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/election")
@@ -37,7 +41,7 @@ public class ElectionController {
                         init.name(),
                         init.description(),
                         init.candidateIDs(),
-                        new Vector<>(),
+                        new ArrayList<>(),
                         Election.ElectionState.OPEN,
                         init.electionMethod(),
                         init.candidateType(),
@@ -55,6 +59,20 @@ public class ElectionController {
             return new ResponseEntity<>(
                 electionService.updateElection(election),
                 HttpStatus.ACCEPTED);
+        }
+    }
+
+    @GetMapping("/results/{electionId}")
+    public ResponseEntity<List<DetailedResult.ResultItem>> getElectionResults(@PathVariable("electionId") String electionId) {
+        Optional<Election> electionO = electionService.getElectionById(electionId);
+        List<Candidate> allCandidates = electionService.getAllCandidates();
+        if(electionO.isPresent()) {
+            List<DetailedResult.ResultItem> result = CountService.getElectionResult(electionO.get(), allCandidates);
+            return new ResponseEntity<>(
+                    result,
+                    HttpStatus.OK);
+        } else {
+            throw new Election.IdNotFoundException();
         }
     }
 

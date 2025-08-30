@@ -6,7 +6,7 @@ export type ElectionTableProps = {
     candidates:Candidate[];
     onCreateElection:()=>void;
     onEditElection:(election:Election)=>void;
-
+    onGetResult:(election:Election)=>void;
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
@@ -45,6 +45,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                             </div></td>
                             <td>
                                 <button onClick={() => props.onEditElection(election)}>Edit</button>
+                                <button onClick={() => props.onGetResult(election)}>Result</button>
                             </td>
                         </tr>
                     )})}
