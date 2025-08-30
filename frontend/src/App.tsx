@@ -34,7 +34,7 @@ function App() {
     const defaultCandidate:Candidate = {
         id:"(automatically assigned)", name:"John Doe",
         description:"an average candidate",
-        party:"Independent", color:"888", type:"Person"
+        party:"Independent", color:"888", type:"Person", archived:false
     };
 
     // temporary variables for forms
@@ -201,6 +201,7 @@ function App() {
                 elections={elections}
                 candidates={candidates}
                 onGetResult={getElectionResults}
+                isArchive={false}
                 onCreateElection={() => {
                     setEditElectionProps({
                         election:defaultElection,
@@ -272,7 +273,14 @@ function App() {
                 onSubmit={() => updateCandidate(editCandidateProps.candidate)}
             />}/>
             <Route path={"/vote/"} element={"This is the vote page"}/>
-            <Route path={"/archive/"} element={"This is the archive page"}/>
+            <Route path={"/archive/"} element={<ElectionTable
+                    elections={elections}
+                    candidates={candidates}
+                    onGetResult={getElectionResults}
+                    isArchive={true}
+                    onCreateElection={() => {}}
+                    onEditElection={() => {}}
+            />}/>
             <Route path={"/result/"} element={"This is the result page"}/>
         </Routes>
     </div>
