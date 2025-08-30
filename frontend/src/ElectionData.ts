@@ -21,6 +21,7 @@ export type Candidate = {
     party:string;
     color:string;
     type:string;
+    archived:boolean;
 }
 
 export type ElectionResultItem = {
@@ -28,4 +29,9 @@ export type ElectionResultItem = {
     firstVotes:string;
     elected:boolean;
     electedAs:string;
+}
+
+export type STVResultItem = {
+    candidateID:string;
+    votes:string[];
 }

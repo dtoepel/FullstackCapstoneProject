@@ -1,5 +1,7 @@
 import type {Candidate, Election} from "./ElectionData.ts";
 import type {FormEvent} from "react";
+import CandidateBox from "./CandidateBox.tsx";
+import {useNavigate} from "react-router-dom";
 
 export type EditElectionFormProps = {
     editMode:boolean;
@@ -11,6 +13,7 @@ export type EditElectionFormProps = {
 }
 
 export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
+    const nav = useNavigate();
 
     function submit(e:FormEvent<HTMLFormElement> ):void {
         e.preventDefault();
@@ -88,6 +91,40 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
     const runningCandidates:Candidate[] =
         getRunningCandidates(props.election, props.candidates);
 
+    function up(candidate:Candidate):void {
+        const index:number = props.election.candidateIDs.indexOf(candidate.id, 0);
+        if (index > 0) {
+            props.election.candidateIDs.splice(index, 1);
+            props.election.candidateIDs.splice(index-1, 0, candidate.id);
+            props.onEdit(props.election)
+            nav(props.editMode?"/editElection/":"/createElection/");
+        }
+    }
+
+    function down(candidate:Candidate):void {
+        const index:number = props.election.candidateIDs.indexOf(candidate.id, 0);
+        if (index > -1 && index < props.election.candidateIDs.length-1) {
+            props.election.candidateIDs.splice(index, 1);
+            props.election.candidateIDs.splice(index+1, 0, candidate.id);
+            props.onEdit(props.election)
+            nav(props.editMode?"/editElection/":"/createElection/");
+        }
+    }
+
+    function add(candidate:Candidate):void {
+        props.election.candidateIDs.push(candidate.id);
+        props.onEdit(props.election)
+        nav(props.editMode?"/editElection/":"/createElection/");
+    }
+
+    function remove(candidate:Candidate):void {
+        const index:number = props.election.candidateIDs.indexOf(candidate.id, 0);
+        if (index > -1) {
+            props.election.candidateIDs.splice(index, 1);
+            props.onEdit(props.election)
+            nav(props.editMode?"/editElection/":"/createElection/");
+        }
+    }
 
     return(
         <div style={{display:"flex", flexDirection:"column"}}>
@@ -156,18 +193,41 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                 </thead>
                 <tbody>
                 <tr>
+
                     <td><div style={{
                         display:"flex",
                         flexDirection: "column",
-                        alignItems: "flex-start"}}>{runningCandidates.map((candidate) => {return (candidate.name)})}
-                    </div></td>
+                        alignItems: "flex-start"}}>{runningCandidates.map((candidate, index, array) => {return (
+                        <CandidateBox candidate={candidate}
+                                      addAvailable={false}
+                                      onAdd={() => {}}
+                                      upAvailable={candidatesEditable && index > 0}
+                                      onUp={() => {up(candidate)}}
+                                      downAvailable={candidatesEditable && index < array.length-1}
+                                      onDown={() => {down(candidate)}}
+                                      deleteAvailable={candidatesEditable}
+                                      onDelete={() => {remove(candidate)}}
+
+                        />
+                    )})}</div></td>
 
                     <td><div style={{
                         display:"flex",
                         flexDirection: "row",
                         flexWrap: "wrap",
-                        alignItems: "flex-start"}}>{availableCandidates.map((candidate) => {return (candidate.name)})}
-                    </div></td>
+                        alignItems: "flex-start"}}>{availableCandidates.map((candidate) => {return (
+                        <CandidateBox candidate={candidate}
+                                      addAvailable={candidatesEditable}
+                                      onAdd={() => {add(candidate)}}
+                                      upAvailable={false}
+                                      onUp={() => {}}
+                                      downAvailable={false}
+                                      onDown={() => {}}
+                                      deleteAvailable={false}
+                                      onDelete={() => {}}
+
+                        />
+                    )})}</div></td>
                 </tr>
                 </tbody>
             </table>
