@@ -9,10 +9,11 @@ public record Candidate(
         String party,
         String color,
         String description,
-        String type) {
+        String type,
+        boolean archived) {
 
     public Candidate(CandidateDTO init, String id) {
-        this(id, init.name(), init.party(), init.color(), init.description(), init.type());
+        this(id, init.name(), init.party(), init.color(), init.description(), init.type(), false);
     }
 
     @ResponseStatus(value= HttpStatus.NOT_FOUND, reason= Election.IdNotFoundException.reason)
