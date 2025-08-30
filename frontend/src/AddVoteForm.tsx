@@ -65,7 +65,8 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
             }
         }
     }
-    const unrankedIDs:string[] = props.election==null?[]:props.election.candidateIDs.filter((cid) => !(props.vote.rankingIDs.indexOf(cid)>=0))
+
+    const unrankedIDs:string[] = props.election==null?[]:props.election.candidateIDs.filter((cid) => props.vote.rankingIDs.indexOf(cid)<0)
 
     let unranked:Candidate[] = [];
      unrankedIDs.forEach((cid) => {
@@ -90,7 +91,7 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                     <td>
                         <select id={"selectElection"} onChange={electionChanged}>
                             {props.allElections.map(election => {
-                                return( <option value={election.id}>{election.name}</option>
+                                return( <option value={election.id} key={election.id}>{election.name}</option>
                             )})}
                         </select>
                     </td>
@@ -106,7 +107,7 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                         display:"flex",
                         flexDirection: "column",
                         alignItems: "flex-start"}}>{ranked.map((candidate, index, array) => {return (
-                            <CandidateBox
+                            <CandidateBox key={candidate.id}
                                 candidate={candidate}
                                 onDelete={() => {voteRemove(candidate)}}
                                 onUp={() => {voteUp(candidate)}}
@@ -125,7 +126,7 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                     display:"flex",
                     flexDirection: "column",
                     alignItems: "flex-start"}}>{unranked.map((candidate) => {return (
-                        <CandidateBox candidate={candidate} addAvailable={true} onAdd={() => {voteAdd(candidate)}}/>
+                        <CandidateBox key={candidate.id} candidate={candidate} addAvailable={true} onAdd={() => {voteAdd(candidate)}}/>
                 )})}</div></td>
                 </tr>
                 <tr>
