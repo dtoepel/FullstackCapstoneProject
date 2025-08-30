@@ -125,7 +125,7 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                         )})}
                     </div>
                 </div>
-                <form onClick={(e)=>submit(e)}><button>Submit</button></form>
+                <form onSubmit={e=>submit(e)}><button>Submit</button></form>
             </div>
         </>
     )
