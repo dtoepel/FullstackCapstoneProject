@@ -11,6 +11,42 @@ export type ElectionTableProps = {
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
+
+    function getDeleteButton(election:Election) {
+        return (<button><s>Delete</s></button>)
+    }
+
+    function getResultButton(election:Election) {
+        return (<button onClick={() => props.onGetResult(election)}>Result</button>)
+    }
+
+    function getButtons(election:Election) {
+        if(election.electionState==="OPEN") {
+            return(<>
+                <button onClick={() => props.onEditElection(election)}>Edit</button>
+                <button><s>Open Voting</s></button>
+                {getDeleteButton(election)}
+            </>)
+        } else if(election.electionState==="VOTING") {
+            return(<>
+                <button><s>Close Voting</s></button>
+                <button><s>Vote</s></button>
+                {getDeleteButton(election)}
+            </>)
+        } else if(election.electionState==="CLOSED") {
+            return(<>
+                {getResultButton(election)}
+                <button><s>Archive</s></button>
+                {getDeleteButton(election)}
+            </>)
+        } else { // ARCHIVED
+            return (<>
+                {getResultButton(election)}
+                {getDeleteButton(election)}
+            </>)
+        }
+    }
+
     return(
         <>
         {props.isArchive?"":<button onClick={() => props.onCreateElection()}>Create</button>}
@@ -46,29 +82,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                                 )})}
                             </div></td>
                             <td>{election.seats}</td>
-                            <td>
-                                {election.electionState === "OPEN"?
-                                    <>
-                                        <button onClick={() => props.onEditElection(election)}>Edit</button>
-                                        <button><s>Open Voting</s></button>
-                                    </>
-                                :election.electionState === "VOTING"?
-                                    <>
-                                        <button><s>Close Voting</s></button>
-                                        <button><s>Vote</s></button>
-                                    </>
-                                :election.electionState === "CLOSED"?
-                                    <>
-                                        <button onClick={() => props.onGetResult(election)}>Result</button>
-                                        <button><s>Archive</s></button>
-                                    </>
-                                :
-                                    <>
-                                        <button onClick={() => props.onGetResult(election)}>Result</button>
-                                    </>
-                                }
-                                <button><s>Delete</s></button>
-                            </td>
+                            <td>{getButtons(election)}</td>
                         </tr>
                     )})}
                 </tbody>
