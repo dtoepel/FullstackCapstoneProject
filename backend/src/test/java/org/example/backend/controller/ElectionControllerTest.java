@@ -30,6 +30,25 @@ public class ElectionControllerTest {
     @Autowired
     private CandidateRepo candidateRepo;
 
+    Candidate defaultCandidate = new Candidate(
+            "1",
+            "John Doe",
+            "Independent",
+            "#444",
+            "some details",
+            "Person",
+            false);
+
+    Election defaultElection = new Election(
+            "1",
+            "MyElection",
+            "some details",
+            new ArrayList<>(),
+            new ArrayList<>(),
+            Election.ElectionState.OPEN,
+            Election.ElectionType.STV,
+            "Person",
+            3);
     @Test
     void getAllProducts() throws Exception {
 
@@ -72,16 +91,8 @@ public class ElectionControllerTest {
     @Test
     void createElectionSuccess() throws Exception {
         //GIVEN
-        Election existingElection = new Election(
-                "1",
-                "MyElection",
-                "some details",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Election.ElectionState.OPEN,
-                Election.ElectionType.STV,
-                "Person",
-                3);
+        Election existingElection = defaultElection;
+        electionRepo.deleteAll();
         electionRepo.save(existingElection);
         //WHEN
 
@@ -119,19 +130,11 @@ public class ElectionControllerTest {
     @Test
     void createElectionDuplicate() throws Exception {
         //GIVEN
-        Election existingElection = new Election(
-                "1",
-                "MyElection",
-                "some details",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Election.ElectionState.OPEN,
-                Election.ElectionType.STV,
-                "Person",
-                3);
+        Election existingElection = defaultElection;
+        electionRepo.deleteAll();
         electionRepo.save(existingElection);
-        //WHEN
 
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -154,19 +157,11 @@ public class ElectionControllerTest {
     @Test
     void updateElectionSuccess() throws Exception {
         //GIVEN
-        Election existingElection = new Election(
-                "1",
-                "MyElection",
-                "some details",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Election.ElectionState.OPEN,
-                Election.ElectionType.STV,
-                "Person",
-                3);
+        Election existingElection = defaultElection;
+        electionRepo.deleteAll();
         electionRepo.save(existingElection);
-        //WHEN
 
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -203,19 +198,11 @@ public class ElectionControllerTest {
     @Test
     void updateElectionNotFound() throws Exception {
         //GIVEN
-        Election existingElection = new Election(
-                "1",
-                "MyElection",
-                "some details",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Election.ElectionState.OPEN,
-                Election.ElectionType.STV,
-                "Person",
-                3);
+        Election existingElection = defaultElection;
+        electionRepo.deleteAll();
         electionRepo.save(existingElection);
-        //WHEN
 
+        //WHE
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -240,13 +227,7 @@ public class ElectionControllerTest {
     void getAllCandidates() throws Exception {
 
         //GIVEN
-        Candidate candidate = new Candidate(
-                "-1",
-                "John Doe",
-                "Independent",
-                "#444",
-                "some details",
-                "Person");
+        Candidate candidate = defaultCandidate;
         candidateRepo.deleteAll();
         candidateRepo.save(candidate);
 
@@ -262,7 +243,8 @@ public class ElectionControllerTest {
                                     "description": "some details",
                                     "party": "Independent",
                                     "color": "#444",
-                                    "type": "Person"
+                                    "type": "Person",
+                                    "archived": false
                                   }
                                 ]
                                 """))
@@ -283,7 +265,8 @@ public class ElectionControllerTest {
                                     "description": "some details",
                                     "party": "Independent",
                                     "color": "#444",
-                                    "type": "Person"
+                                    "type": "Person",
+                                    "archived": false
                                 }
                                 """))
                 //THEN
@@ -295,7 +278,8 @@ public class ElectionControllerTest {
                                     "description": "some details",
                                     "party": "Independent",
                                     "color": "#444",
-                                    "type": "Person"
+                                    "type": "Person",
+                                    "archived": false
                                 }
                                 """))
                 .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty());
@@ -304,16 +288,11 @@ public class ElectionControllerTest {
     @Test
     void updateCandidateSuccess() throws Exception {
         //GIVEN
-        Candidate existingCandidate = new Candidate(
-                "1",
-                "John Doe",
-                "Independent",
-                "#444",
-                "some details",
-                "Person");
-        candidateRepo.save(existingCandidate);
-        //WHEN
+        Candidate candidate = defaultCandidate;
+        candidateRepo.deleteAll();
+        candidateRepo.save(candidate);
 
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -323,7 +302,8 @@ public class ElectionControllerTest {
                                     "description": "some details",
                                     "party": "Independent",
                                     "color": "#555",
-                                    "type": "Person"
+                                    "type": "Person",
+                                    "archived": false
                                 }
                                 """))
                 //THEN
@@ -336,7 +316,8 @@ public class ElectionControllerTest {
                                     "description": "some details",
                                     "party": "Independent",
                                     "color": "#555",
-                                    "type": "Person"
+                                    "type": "Person",
+                                    "archived": false
                                 }
                                 """));
     }
@@ -344,16 +325,11 @@ public class ElectionControllerTest {
     @Test
     void updateCandidateNotFound() throws Exception {
         //GIVEN
-        Candidate existingCandidate = new Candidate(
-                "1",
-                "John Doe",
-                "Independent",
-                "#444",
-                "some details",
-                "Person");
-        candidateRepo.save(existingCandidate);
-        //WHEN
+        Candidate candidate = defaultCandidate;
+        candidateRepo.deleteAll();
+        candidateRepo.save(candidate);
 
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -363,7 +339,8 @@ public class ElectionControllerTest {
                                     "description": "some details",
                                     "party": "Independent",
                                     "color": "#555",
-                                    "type": "Person"
+                                    "type": "Person",
+                                    "archived": false
                                 }
                                 """))
                 //THEN
@@ -385,9 +362,9 @@ public class ElectionControllerTest {
                 "any",
                 1);
         electionRepo.save(existingElection);
-        candidateRepo.save(new Candidate("A", "Alice", "", "", "", ""));
-        candidateRepo.save(new Candidate("B", "Bob", "", "", "", ""));
-        candidateRepo.save(new Candidate("C", "Charlie", "", "", "", ""));
+        candidateRepo.save(new Candidate("A", "Alice", "", "", "", "", false));
+        candidateRepo.save(new Candidate("B", "Bob", "", "", "", "", false));
+        candidateRepo.save(new Candidate("C", "Charlie", "", "", "", "", false));
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
