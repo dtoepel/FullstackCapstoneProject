@@ -90,16 +90,16 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                 return( <option value={election.id} key={election.id}>{election.name}</option>
                 )})}
             </select>
-            <div className={"ballot"} style={{maxWidth:"500px"}}>
+            <div className={"ballot"} style={{maxWidth:"min(500px,95vw)"}}>
                 <p style={{fontWeight:"bold",fontSize:"48px",color:"var(--mydarkblue)"}}>Ballot</p>
                 <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
-                    <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>No. {ballotNo}</p>
+                    <p style={{fontWeight:"bold",fontSize:"20px",color:"#fff"}}>No. {ballotNo}</p>
                     <p style={{fontWeight:"bold",fontSize:"12px",color:"#fff"}}>for the</p>
-                    <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>{props.election?props.election.name:"(Election not selected!)"}</p>
+                    <p style={{fontWeight:"bold",fontSize:"20px",color:"#fff"}}>{props.election?props.election.name:"(Election not selected!)"}</p>
                 </div>
                 <div className={"ballot-item"} style={{flexDirection:"row"}}>
-                    <p style={{fontWeight:"bold",fontSize:"24px",color:"var(--mydarkblue)"}}>Vaildation Code:</p>
-                    <input/>
+                    <p style={{fontWeight:"bold",fontSize:"16px",color:"var(--mydarkblue)"}}>Validation Code:</p>
+                    <input style={{width:"33%",margin:"0 0 0 10px"}}/>
                 </div>
                 <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
                     <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>Ranked Candidates:</p>
@@ -113,7 +113,9 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                                           deleteAvailable={true}
                                           upAvailable={index > 0}
                                           downAvailable={index < array.length-1}
-                                          rank={index+1}/>
+                                          rank={index+1}
+                                          color={"var(--myblue)"}
+                            />
                         )})}
                     </div>
                 </div>
@@ -121,11 +123,15 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                     <p style={{fontWeight:"bold",fontSize:"24px",color:"var(--mydarkblue)"}}>Unranked Candidates:</p>
                     <div style={{display:"flex", flexDirection:"row",flexWrap:"wrap",alignContent:"flex-start"}}>
                         {unranked.map((candidate) => {return (
-                            <CandidateBox key={candidate.id} candidate={candidate} addAvailable={true} onAdd={() => {voteAdd(candidate)}}/>
+                            <CandidateBox key={candidate.id} candidate={candidate}
+                                          addAvailable={true} onAdd={() => {voteAdd(candidate)}}
+                                          color={"var(--mydarkblue)"}/>
                         )})}
                     </div>
                 </div>
-                <form onSubmit={e=>submit(e)}><button>Submit</button></form>
+                <form onSubmit={e=>submit(e)}>
+                    <button style={{backgroundColor:"var(--mydarkblue)", color:"#fff",
+                        fontWeight:"bold",fontSize:"24px"}}>Submit</button></form>
             </div>
         </>
     )
