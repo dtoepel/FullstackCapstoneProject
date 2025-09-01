@@ -291,6 +291,7 @@ function App() {
             />}/>
             <Route path={"/candidates/"} element={<CandidateTable
                 value={candidates}
+                elections={elections}
                 onCreateCandidate={() => {
                     setEditCandidateProps({
                         candidate:defaultCandidate,
