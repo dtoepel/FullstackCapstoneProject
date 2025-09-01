@@ -6,14 +6,18 @@ export type ElectionTableProps = {
     candidates:Candidate[];
     onCreateElection:()=>void;
     onEditElection:(election:Election)=>void;
+    onOpenVoting:(election:Election)=>void;
+    onCloseVoting:(election:Election)=>void;
+    onArchiveElection:(election:Election)=>void;
     onGetResult:(election:Election)=>void;
+    onDeleteElection:(election:Election)=>void;
     isArchive:boolean;
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
 
     function getDeleteButton(election:Election) {
-        return (<button><s>Delete</s></button>)
+        return (<button onClick={() => props.onDeleteElection(election)}>Delete</button>)
     }
 
     function getResultButton(election:Election) {
@@ -24,19 +28,19 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
         if(election.electionState==="OPEN") {
             return(<>
                 <button onClick={() => props.onEditElection(election)}>Edit</button>
-                <button><s>Open Voting</s></button>
+                <button onClick={() => props.onOpenVoting(election)}>Open Voting</button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="VOTING") {
             return(<>
-                <button><s>Close Voting</s></button>
+                <button onClick={() => props.onCloseVoting(election)}>Close Voting</button>
                 <button><s>Vote</s></button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="CLOSED") {
             return(<>
                 {getResultButton(election)}
-                <button><s>Archive</s></button>
+                <button onClick={() => props.onArchiveElection(election)}>Archive</button>
                 {getDeleteButton(election)}
             </>)
         } else { // ARCHIVED

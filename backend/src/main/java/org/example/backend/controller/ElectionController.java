@@ -10,11 +10,11 @@ import org.example.backend.service.ElectionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.Vector;
 import java.util.Optional;
 
 @RestController
@@ -74,6 +74,12 @@ public class ElectionController {
         } else {
             throw new Election.IdNotFoundException();
         }
+    }
+
+    @DeleteMapping("/{electionId}")
+    public void deleteElection(@PathVariable("electionId") String electionId) {
+        if(!electionService.deleteElection(electionId))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Object does not exist");
     }
 
     @GetMapping("/candidates")

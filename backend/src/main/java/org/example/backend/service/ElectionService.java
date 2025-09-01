@@ -29,4 +29,12 @@ public class ElectionService {
     public Candidate createCandidate(Candidate candidate) { return candidateRepo.save(candidate); }
     public Candidate updateCandidate(Candidate candidate) { return candidateRepo.save(candidate); }
 
+    public boolean deleteElection(String electionId) {
+        Optional<Election> response = electionRepo.findById(electionId);
+        if(response.isPresent()) {
+            electionRepo.deleteById(electionId);
+            return true;
+        }
+        return false;
+    }
 }
