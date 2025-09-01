@@ -198,7 +198,8 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                         display:"flex",
                         flexDirection: "column",
                         alignItems: "flex-start"}}>{runningCandidates.map((candidate, index, array) => {return (
-                        <CandidateBox candidate={candidate}
+                        <CandidateBox key={candidate.id}
+                                      candidate={candidate}
                                       addAvailable={false}
                                       onAdd={() => {}}
                                       upAvailable={candidatesEditable && index > 0}
@@ -216,7 +217,8 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                         flexDirection: "row",
                         flexWrap: "wrap",
                         alignItems: "flex-start"}}>{availableCandidates.map((candidate) => {return (
-                        <CandidateBox candidate={candidate}
+                        <CandidateBox key={candidate.id}
+                                      candidate={candidate}
                                       addAvailable={candidatesEditable}
                                       onAdd={() => {add(candidate)}}
                                       upAvailable={false}

@@ -12,6 +12,7 @@ export type CandidateBoxProps = {
     downAvailable:boolean;
     rank:number|undefined;
     strikethrough:boolean;
+    color:string|null
 }
 
 CandidateBox.defaultProps = {
@@ -24,19 +25,26 @@ CandidateBox.defaultProps = {
     upAvailable:false,
     downAvailable:false,
     rank:null,
-    strikethrough:false
+    strikethrough:false,
+    color:null
 }
 
-
 export default function CandidateBox(props:Readonly<CandidateBoxProps>) {
+    props = {...CandidateBox.defaultProps, ...props}
+    const color:string = props.color===null?("#"+props.candidate.color):props.color;
     return(
-        <div className={"small-card-candidate"} style={{background:"#"+props.candidate.color}}>
+        <div className={"small-card-candidate"} style={{backgroundColor:color}}>
+
+            {props.color!=null?
+                <div className={"small-card-candidate-partybutton"}
+                     style={{backgroundColor:("#"+props.candidate.color)}}>&nbsp;</div>
+            :""}
 
             <span className={"small-card-candidate"}>{props.strikethrough?(
                 <s>{(props.rank==null?"":(props.rank+". "))+props.candidate.name}</s>
             ):(
                 (props.rank==null?"":(props.rank+". "))+props.candidate.name
-                )}</span>
+            )}</span>
 
             {props.addAvailable?<button className={"small-card-candidate"}
                                     onClick={() => {props.onAdd()}}>✚</button>:""}

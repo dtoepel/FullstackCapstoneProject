@@ -389,4 +389,30 @@ public class ElectionControllerTest {
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.reason));
 
     }
+
+    @Test
+    void deleteElectionSuccess() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(defaultElection);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+defaultElection.id()))
+
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @Test
+
+    void deleteElectionFail() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+defaultElection.id()))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
 }

@@ -65,7 +65,8 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
             }
         }
     }
-    const unrankedIDs:string[] = props.election==null?[]:props.election.candidateIDs.filter((cid) => !(props.vote.rankingIDs.indexOf(cid)>=0))
+
+    const unrankedIDs:string[] = props.election==null?[]:props.election.candidateIDs.filter((cid) => props.vote.rankingIDs.indexOf(cid)<0)
 
     let unranked:Candidate[] = [];
      unrankedIDs.forEach((cid) => {
@@ -83,57 +84,55 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
     }
     ballotNo = ballotNo.substring(0,2)+"-"+ ballotNo.substring(2,3)+"-"+ ballotNo.substring(3,5)
 
-    return(
-            <table border={1}>
-                <tbody>
-                <tr>
-                    <td>
-                        <select id={"selectElection"} onChange={electionChanged}>
-                            {props.allElections.map(election => {
-                                return( <option value={election.id}>{election.name}</option>
-                            )})}
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colSpan={2}>Ballot No. {ballotNo}</td>
-                </tr>
-                <tr>
-                    <td>
-                        ranked Candidates
-                    </td>
-                    <td><div style={{
-                        display:"flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start"}}>{ranked.map((candidate, index, array) => {return (
-                            <CandidateBox
-                                candidate={candidate}
-                                onDelete={() => {voteRemove(candidate)}}
-                                onUp={() => {voteUp(candidate)}}
-                                onDown={() => {voteDown(candidate)}}
-                                deleteAvailable={true}
-                                upAvailable={index > 0}
-                                downAvailable={index < array.length-1}
-                                rank={index+1}/>
-                    )})}</div></td>
-                </tr>
-                <tr>
-                    <td>
-                        Unranked Candidates
-                    </td>
-                    <td><div style={{
-                    display:"flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start"}}>{unranked.map((candidate) => {return (
-                        <CandidateBox candidate={candidate} addAvailable={true} onAdd={() => {voteAdd(candidate)}}/>
-                )})}</div></td>
-                </tr>
-                <tr>
-                    <td colSpan={2}>
-                        <form onClick={(e)=>submit(e)}><button>Submit</button></form>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    return(<>
+            <select id={"selectElection"} onChange={electionChanged}>
+            {props.allElections.map(election => {
+                return( <option value={election.id} key={election.id}>{election.name}</option>
+                )})}
+            </select>
+            <div className={"ballot"} style={{maxWidth:"min(500px,95vw)"}}>
+                <p style={{fontWeight:"bold",fontSize:"48px",color:"var(--mydarkblue)"}}>Ballot</p>
+                <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
+                    <p style={{fontWeight:"bold",fontSize:"20px",color:"#fff"}}>No. {ballotNo}</p>
+                    <p style={{fontWeight:"bold",fontSize:"12px",color:"#fff"}}>for the</p>
+                    <p style={{fontWeight:"bold",fontSize:"20px",color:"#fff"}}>{props.election?props.election.name:"(Election not selected!)"}</p>
+                </div>
+                <div className={"ballot-item"} style={{flexDirection:"row"}}>
+                    <p style={{fontWeight:"bold",fontSize:"16px",color:"var(--mydarkblue)"}}>Validation Code:</p>
+                    <input style={{width:"33%",margin:"0 0 0 10px"}}/>
+                </div>
+                <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>Ranked Candidates:</p>
+                    <div style={{display:"flex", flexDirection:"column"}}>
+                        {ranked.map((candidate, index, array) => {return (
+                            <CandidateBox key={candidate.id}
+                                          candidate={candidate}
+                                          onDelete={() => {voteRemove(candidate)}}
+                                          onUp={() => {voteUp(candidate)}}
+                                          onDown={() => {voteDown(candidate)}}
+                                          deleteAvailable={true}
+                                          upAvailable={index > 0}
+                                          downAvailable={index < array.length-1}
+                                          rank={index+1}
+                                          color={"var(--myblue)"}
+                            />
+                        )})}
+                    </div>
+                </div>
+                <div className={"ballot-item"} style={{flexDirection:"column"}}>
+                    <p style={{fontWeight:"bold",fontSize:"24px",color:"var(--mydarkblue)"}}>Unranked Candidates:</p>
+                    <div style={{display:"flex", flexDirection:"row",flexWrap:"wrap",alignContent:"flex-start"}}>
+                        {unranked.map((candidate) => {return (
+                            <CandidateBox key={candidate.id} candidate={candidate}
+                                          addAvailable={true} onAdd={() => {voteAdd(candidate)}}
+                                          color={"var(--mydarkblue)"}/>
+                        )})}
+                    </div>
+                </div>
+                <form onSubmit={e=>submit(e)}>
+                    <button style={{backgroundColor:"var(--mydarkblue)", color:"#fff",
+                        fontWeight:"bold",fontSize:"24px"}}>Submit</button></form>
+            </div>
+        </>
     )
 }
