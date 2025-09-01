@@ -104,7 +104,7 @@ function App() {
             })
     }
 
-    function updateElection(election:Election) {
+    function updateElection(election:Election):void {
         axios.put("/api/election", election)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
@@ -112,6 +112,33 @@ function App() {
                     setEditElectionProps({...editElectionProps, error:error.response.data.message})
                 }
             })
+    }
+
+    function openVoting(election:Election):void {
+        election.electionState = "VOTING";
+        axios.put("/api/election", election)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => { console.log(error) })
+    }
+
+    function closeVoting(election:Election):void {
+        election.electionState = "CLOSED";
+        axios.put("/api/election", election)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => { console.log(error) })
+    }
+
+    function archiveElection(election:Election):void {
+        election.electionState = "ARCHIVED";
+        axios.put("/api/election", election)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => { console.log(error) })
+    }
+
+    function deleteElection(election:Election):void {
+        axios.delete("/api/election/" + election.id)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => { console.log(error) })
     }
 
     function createCandidate(candidate:Candidate):void {
@@ -237,6 +264,10 @@ function App() {
                     })
                     nav("/editElection/")
                 }}
+                onOpenVoting={openVoting}
+                onCloseVoting={closeVoting}
+                onArchiveElection={archiveElection}
+                onDeleteElection={deleteElection}
             />}/>
             <Route path={"/createElection/"} element={<ElectionForm
                 election={editElectionProps.election}
@@ -305,6 +336,10 @@ function App() {
                     isArchive={true}
                     onCreateElection={() => {}}
                     onEditElection={() => {}}
+                    onOpenVoting={() => {}}
+                    onCloseVoting={() => {}}
+                    onArchiveElection={() => {}}
+                    onDeleteElection={deleteElection}
             />}/>
             <Route path={"/result/"} element={"This is the result page"}/>
         </Routes>
