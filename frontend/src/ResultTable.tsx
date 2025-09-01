@@ -27,7 +27,7 @@ export default function ResultTable(props:Readonly<ResultTableProps>) {
                     <th>Rank</th>
                     <th style={{width:"10px"}}>&nbsp;</th>
                     <th>Candidate</th>
-                    {firstLine.votes.map((_x, i) => {return(<th>Count {i+1}</th>)})}
+                    {firstLine.votes.map((_x, i) => {return(<th key={"result-column-"+i}>Count {i+1}</th>)})}
                 </tr>
             </thead>
             <tbody>
