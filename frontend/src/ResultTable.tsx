@@ -5,9 +5,19 @@ export type ResultTableProps = {
     allCandidates:Candidate[];
 }
 
+function getResultCell(votes: string, key: string) {
+    if(votes==="ELECTED") {
+        return <td key={key} style={{backgroundColor:"#6b9"}}>★</td>;
+    } else if(votes==="EXCLUDED") {
+        return <td key={key} style={{backgroundColor:"#f8c"}}>☓</td>;
+    } else {
+        return <td key={key}>{votes}</td>;
+    }
+}
+
 export default function ResultTable(props:Readonly<ResultTableProps>) {
     const firstLineU:STVResultItem|undefined = props.result.at(0);
-    const firstLine:STVResultItem = firstLineU===undefined?{candidateID:"",votes:[]}:firstLineU;
+    const firstLine:STVResultItem = firstLineU ?? {candidateID:"",votes:[]};
 
     return(
         <div style={{overflow:"scroll", height:"400px", width:"95vw"}}>
@@ -22,19 +32,20 @@ export default function ResultTable(props:Readonly<ResultTableProps>) {
             </thead>
             <tbody>
             {props.result.map((item, y) => {
-                const candidateU:Candidate|undefined = props.allCandidates.filter(c => c.id === item.candidateID).at(0);
-                const candidate:Candidate = candidateU===undefined?
-                    {name:"Candidate not found",id:"",type:"",archived:false,party:"",color:"",description:""}
-                    :candidateU;
+                const candidateU:Candidate|undefined = props.allCandidates
+                    .filter(c => c.id === item.candidateID)
+                    .at(0);
+                const candidate:Candidate = candidateU ?? {
+                    name:"Candidate not found",id:"",type:"",archived:false,party:"",color:"",description:""};
+
               return (
-                  <tr>
+                  <tr key={"result-row-" + y}>
                       <th>{y+1}</th>
                       <th style={{backgroundColor:"#"+candidate.color}}>&nbsp;</th>
                       <th>{candidate.name}</th>
-                      {item.votes.map(votes => {return(
-                          votes==="ELECTED"?<td style={{backgroundColor:"#6b9"}}>★</td>:votes==="EXCLUDED"?<td style={{backgroundColor:"#f8c"}}>☓</td>:<td>{votes}</td>
-
-                      )})}
+                      {item.votes.map((votes, x) => {
+                          const key:string = "result-cell-" + x +"-" + y;
+                          return(getResultCell(votes, key))})}
                   </tr>
               )})}
             </tbody>
