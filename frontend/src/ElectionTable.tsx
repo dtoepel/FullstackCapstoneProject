@@ -29,12 +29,14 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
             return(<>
                 <button onClick={() => props.onEditElection(election)}>Edit</button>
                 <button onClick={() => props.onOpenVoting(election)}>Open Voting</button>
+                <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="VOTING") {
             return(<>
                 <button onClick={() => props.onCloseVoting(election)}>Close Voting</button>
                 <button><s>Vote</s></button>
+                <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="CLOSED") {
