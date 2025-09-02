@@ -1,58 +1,12 @@
 import {type Candidate, type Election, getAllCandidateTypes} from "./ElectionData.ts";
 import {type ChangeEvent, useState} from "react";
+import PageSelector from "./img/PageSelector.tsx";
 
 export type CandidateTableProps = {
     value:Candidate[];
     elections:Election[];
     onCreateCandidate:()=>void;
     onEditCandidate:(candidate:Candidate)=>void;
-}
-
-function getPreviousButton(
-    page: number,
-    setPage: (value:number) => void) {
-
-    if(page > 0) {
-        return(<button onClick={() => setPage(page-1)}>&lt;&lt;</button>)
-    } else {
-        return(<button disabled>&lt;&lt;</button>)
-    }
-}
-
-function getNextButton(
-    maxPages: number,
-    page: number,
-    setPage: (value:number) => void) {
-
-    if(page < maxPages-1) {
-        return(<button onClick={() => setPage(page+1)}>&gt;&gt;</button>)
-    } else {
-        return(<button disabled>&gt;&gt;</button>)
-    }
-}
-
-function getPageSelector(
-    maxPages: number,
-    page: number,
-    setPage: (value:number) => void) {
-    const pageNums:number[] = [];
-
-    for (let i:number = 0; i < maxPages; i++) {
-        pageNums.push(i);
-    }
-
-    return(
-        <select onChange={e =>
-            setPage(Number.parseInt(e.target.value))
-        }>
-            {pageNums.map(n => {
-                if(n==page)
-                    return(<option key={"page-option"+n} value={n+""} selected>Page {n+1}</option>)
-                else
-                    return(<option key={"page-option"+n} value={n+""}>Page {n+1}</option>)
-            })}
-        </select>
-    )
 }
 
 function getDeleteButton(candidate:Candidate, elections:Election[]) {
@@ -72,7 +26,7 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
     const itemCount:number = filteredCandidates.length;
     const maxItems:number = 12;
     const maxPages:number = itemCount==0?1:Math.floor((itemCount + maxItems - 1) / maxItems);
-    const candidatesOnPage:Candidate[] = filteredCandidates.slice(maxItems * page, maxItems * (page+1))
+    const candidatesOnPage:Candidate[] = filteredCandidates.slice(maxItems * page, maxItems * (page+1));
 
     function filterChanged(e:ChangeEvent<HTMLSelectElement>):void {
         const selectedType = e.target.value;
@@ -90,9 +44,7 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                         <option value={type}>{type}</option>
                     )})}
                 </select>
-                {getPreviousButton(page, setPage)}
-                {getPageSelector(maxPages, page, setPage)}
-                {getNextButton(maxPages, page, setPage)}
+                <PageSelector page={page} setPage={setPage} maxPages={maxPages}/>
                 <button onClick={() => props.onCreateCandidate()}>Create</button>
             </div>
 
