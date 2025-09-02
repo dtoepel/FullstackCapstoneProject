@@ -34,6 +34,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
             </>)
         } else if(election.electionState==="VOTING") {
             return(<>
+                <button onClick={() => props.onEditElection(election)}>Edit</button>
                 <button onClick={() => props.onCloseVoting(election)}>Close Voting</button>
                 <button><s>Vote</s></button>
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>

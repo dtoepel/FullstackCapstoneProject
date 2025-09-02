@@ -1,4 +1,4 @@
-import type {Candidate, Election} from "./ElectionData.ts";
+import {type Candidate, type Election, getAllCandidateTypes} from "./ElectionData.ts";
 import {type ChangeEvent, useState} from "react";
 
 export type CandidateTableProps = {
@@ -6,20 +6,6 @@ export type CandidateTableProps = {
     elections:Election[];
     onCreateCandidate:()=>void;
     onEditCandidate:(candidate:Candidate)=>void;
-}
-
-function getAllTypes(candidates : Candidate[]):string[] {
-    const types:string[] = [];
-
-    candidates
-    .filter(candidate => candidate.type)
-    .forEach(candidate => {
-        const index = types.indexOf(candidate.type);
-        if(index < 0) {
-            types.push(candidate.type);
-        }
-    })
-    return types;
 }
 
 function getPreviousButton(
@@ -78,8 +64,7 @@ function getDeleteButton(candidate:Candidate, elections:Election[]) {
 }
 
 export default function CandidateTable(props:Readonly<CandidateTableProps>) {
-    const types:string[] = getAllTypes(props.value);
-
+    const types:string[] = getAllCandidateTypes(props.value);
     const [typeFilter, setTypeFilter] = useState<string|null>(null);
     const [page, setPage] = useState<number>(0);
     const filteredCandidates:Candidate[] = props.value
