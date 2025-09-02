@@ -5,6 +5,7 @@
   text-align: center;
 
   --myblue:#48f;
+  --mydarkblue:#248;
   --mygreen:#385;
   --myred:#c68;
   --mydarkgray:#888;
@@ -68,6 +69,7 @@ div.small-card-candidate{
   align-items:baseline;
   background-color: #535bf2;
   margin: 2px;
+  padding: 1px;
 }
 
 span.small-card-candidate{
@@ -76,8 +78,8 @@ span.small-card-candidate{
   display: inline;
   border-radius: 5px;
   white-space: nowrap;
-  margin: 2px;
-  padding: 0 2px;
+  margin: 1px;
+  padding: 0 3px;
   background-color: rgba(255,255,255,.7);
 }
 
@@ -90,8 +92,42 @@ button.small-card-candidate{
   border-radius: 5px;
   padding: 0;
   border-spacing: 0;
-  margin: 2px 2px 2px 0;
+  margin: 1px;
   text-align: center;
   color: #fff;
   background-color: #444;
+}
+
+div.small-card-candidate-partybutton{
+  flex: 0 0 18px;
+  font-size: 12px;
+  height: 18px;
+  width: 18px;
+  border-radius: 5px;
+  padding: 0;
+  border-spacing: 0;
+  margin: 1px;
+}
+
+div.ballot {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--myblue);
+  border-radius: 16px;
+  padding: 4px;
+}
+
+div.ballot-item {
+  display: flex;
+  border-radius: 12px;
+  padding: 4px;
+  justify-content: center;
+}
+
+div.ballot > p {
+  margin: 0;
+}
+
+div.ballot-item  > p {
+  margin: 0;
 }

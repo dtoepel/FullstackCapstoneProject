@@ -7,7 +7,7 @@ import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
 
-import type {Candidate, Election} from "./ElectionData.ts";
+import type {Candidate, Election, Vote} from "./ElectionData.ts";
 
 import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
@@ -18,6 +18,7 @@ import CandidateForm from "./CandidateForm.tsx";
 import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
+import AddVoteForm from "./AddVoteForm.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -35,6 +36,9 @@ function App() {
         id:"(automatically assigned)", name:"John Doe",
         description:"an average candidate",
         party:"Independent", color:"888", type:"Person", archived:false
+    };
+    const defaultVote:Vote = {
+        rankingIDs:[]
     };
 
     // temporary variables for forms
@@ -64,6 +68,8 @@ function App() {
         error:null,
         onSuccess:()=>{}});
 
+    const [currentElection, setCurrentElection] = useState<Election|null>(null);
+    const [newVote, setNewVote] = useState<Vote>(defaultVote)
 
     // only place to update data
     // could be split to reduce traffic by a small amount
@@ -139,8 +145,6 @@ function App() {
         axios.post("/api/election/candidates", candidate)
             .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
             .catch(error => {
-                console.log(error);
-                console.log(error.status);
                 if(error.status == 403) {
                     console.log(error.response.data.message);
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
@@ -152,7 +156,6 @@ function App() {
         axios.put("/api/election/candidates", candidate)
             .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
             .catch(error => {
-                console.log(error);
                 if(error.response && error.response.status == 404) {
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
                 }
@@ -186,6 +189,21 @@ function App() {
                 console.log(response.data)
             }
         )
+    }
+
+    function submitVote():void {
+        const election:Election|null = currentElection
+        if(election) {
+            election.votes.push(newVote);
+            axios.put("/api/election", election).then(() => {
+                setNewVote(defaultVote);
+                setCurrentElection(null);
+                getAllElectionsAndCandidates();
+                nav("/");
+            }).catch(error => {
+                console.log(error);
+            })
+        }
     }
 
     useEffect(() => {
@@ -302,7 +320,15 @@ function App() {
                 onEdit={(candidate) => setEditCandidateProps({...editCandidateProps, candidate:candidate})}
                 onSubmit={() => updateCandidate(editCandidateProps.candidate)}
             />}/>
-            <Route path={"/vote/"} element={"This is the vote page"}/>
+            <Route path={"/vote/"} element={<AddVoteForm
+                election={currentElection}
+                setElection={(election) => {setCurrentElection(election); setNewVote(defaultVote)}}
+                allElections={elections}
+                allCandidates={candidates}
+                vote={newVote}
+                setVote={setNewVote}
+                onVoteSubmit={submitVote}
+            />}/>
             <Route path={"/archive/"} element={<ElectionTable
                     elections={elections}
                     candidates={candidates}
