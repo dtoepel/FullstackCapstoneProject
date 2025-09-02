@@ -187,9 +187,9 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                                     onChange={e => changeType(e.target.value)}>
                                 {candidateTypes.map(type => {
                                     if(type === props.election.candidateType)
-                                        return(<option value={type} selected>{type}</option>)
+                                        return(<option value={type} key={"candidate-type-option-"+type} selected>{type}</option>)
                                     else
-                                        return(<option value={type}>{type}</option>)
+                                        return(<option value={type} key={"candidate-type-option-"+type}>{type}</option>)
                                 })}
                             </select>
                         :props.election.candidateType
