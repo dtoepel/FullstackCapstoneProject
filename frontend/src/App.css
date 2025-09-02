@@ -12,6 +12,22 @@
   --mylightgray:#ddd;
 }
 
+button {
+  border-radius: 5px;
+  padding: 2px;
+  margin: 2px;
+  color: #fff;
+  background-color: var(--myblue);
+}
+
+button:disabled{
+   border-radius: 5px;
+   padding: 2px;
+   margin: 2px;
+   color: var(--mydarkgray);
+   background-color: var(--mylightgray);
+ }
+
 div.navigation-bar {
   overflow: hidden;
   display:flex;
