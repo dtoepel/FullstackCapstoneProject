@@ -29,6 +29,16 @@ class ElectionTest {
     }
 
     @Test
+    void advanceFail() {
+        //GIVEN
+        //WHEN
+        final Election f = DEFAULT_ELECTION.advance().advance();
+
+        //THEN
+        assertThrows(Exception.class, f::advance);
+    }
+
+    @Test
     void vote() {
         //GIVEN
         Election e = DEFAULT_ELECTION;

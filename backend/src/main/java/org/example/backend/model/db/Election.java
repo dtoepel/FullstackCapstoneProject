@@ -3,6 +3,7 @@ package org.example.backend.model.db;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,10 +50,23 @@ public record Election(
         public static final String reason = "ID not found";
     }
 
-    @ResponseStatus(value=HttpStatus.FORBIDDEN)
-    public static class IllegalManipulationException extends RuntimeException {
+    public static class IllegalManipulationException extends ResponseStatusException {
         public IllegalManipulationException(String message) {
-            super(message);
+            super(HttpStatus.FORBIDDEN, message);
         }
+
+        public static final String MSG_ALREADY_ARCHIVED = "Status Archived cannot be advanced";
+        public static final String MSG_TOO_FEW_CANDIDATES = "Election has too few candidates to be opened";
+        public static final String MSG_TOO_FEW_VOTES = "Election has too few votes to be closed";
+        public static final String MSG_VOTES_CANNOT_BE_CAST = "Votes cannot be cast in this state";
+        public static final String MSG_NO_EMPTY_VOTES = "Vote cannot be empty";
+        public static final String MSG_CANNOT_COUNT_EMPTY_VOTES = "Empty votes cannot be counted";
+        public static final String MSG_CANNOT_CHANGE_VOTES = "Votes cannot be changed through this method";
+
+            public static final String MSG_CANNOT_CHANGE_STATUS = "Status cannot be changed through this method";
+            public static final String MSG_CANNOT_CHANGE_CANDIDATES = "Candidates cannot be changed unless the election is OPEN";
+        public static final String MSG_CANNOT_CHANGE_TYPE = "Candidate Type cannot be changed unless the election is OPEN";
+        public static final String MSG_CANNOT_CHANGE_METHOD = "Election Method cannot be changed unless the election is OPEN";
+            public static final String MSG_CANNOT_CHANGE_SEATS = "Number of Seats cannot be changed unless the election is OPEN";
     }
 }
