@@ -117,22 +117,19 @@ function App() {
     }
 
     function openVoting(election:Election):void {
-        election.electionState = "VOTING";
-        axios.put("/api/election", election)
+        axios.post("api/election/advance/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => { console.log(error) })
     }
 
     function closeVoting(election:Election):void {
-        election.electionState = "CLOSED";
-        axios.put("/api/election", election)
+        axios.post("api/election/advance/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => { console.log(error) })
     }
 
     function archiveElection(election:Election):void {
-        election.electionState = "ARCHIVED";
-        axios.put("/api/election", election)
+        axios.post("api/election/advance/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => { console.log(error) })
     }
@@ -198,8 +195,7 @@ function App() {
     function submitVote():void {
         const election:Election|null = currentElection
         if(election) {
-            election.votes.push(newVote);
-            axios.put("/api/election", election).then(() => {
+            axios.post("/api/election/vote/" + election.id, newVote).then(() => {
                 setNewVote(defaultVote);
                 setCurrentElection(null);
                 getAllElectionsAndCandidates();

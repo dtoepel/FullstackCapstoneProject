@@ -2,10 +2,7 @@ package org.example.backend.controller;
 
 import org.example.backend.model.count.CountService;
 import org.example.backend.model.count.DetailedResult;
-import org.example.backend.model.db.Candidate;
-import org.example.backend.model.db.CandidateDTO;
-import org.example.backend.model.db.Election;
-import org.example.backend.model.db.ElectionDTO;
+import org.example.backend.model.db.*;
 import org.example.backend.service.ElectionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,13 +49,72 @@ public class ElectionController {
 
     @PutMapping
     public ResponseEntity<Election> updateElection(@RequestBody Election election) {
-        List<Election> allElections = electionService.getAllElections();
-        if(allElections.stream().filter(electionDB -> electionDB.id().equals(election.id())).toList().isEmpty()) {
-            throw new Election.IdNotFoundException();
-        } else {
+        Optional<Election> electionO = electionService.getElectionById(election.id());
+        if(electionO.isPresent()) {
+            Election electionDB = electionO.get();
+            if(!electionDB.id().equals(election.id())) {
+                throw new Election.IllegalManipulationException("Id cannot be changed");}
+            if(!electionDB.votes().equals(election.votes())) {
+                throw new Election.IllegalManipulationException("Votes cannot be changed through this method");}
+            if(!electionDB.electionState().equals(election.electionState())) {
+                throw new Election.IllegalManipulationException("Status cannot be changed through this method");}
+            if (election.electionState() != Election.ElectionState.OPEN) {
+                if (!electionDB.candidateIDs().equals(election.candidateIDs())) {
+                    throw new Election.IllegalManipulationException("Candidates cannot be changed unless the election is OPEN");
+                }
+                if (!electionDB.candidateType().equals(election.candidateType())) {
+                    throw new Election.IllegalManipulationException("Candidate Type cannot be changed unless the election is OPEN");
+                }
+                if (!electionDB.electionMethod().equals(election.electionMethod())) {
+                    throw new Election.IllegalManipulationException("Election Method cannot be changed unless the election is OPEN");
+                }
+                if (electionDB.seats() != (election.seats())) {
+                    throw new Election.IllegalManipulationException("Number of Seats cannot be changed unless the election is OPEN");
+                }
+            }
             return new ResponseEntity<>(
-                electionService.updateElection(election),
-                HttpStatus.ACCEPTED);
+                    electionService.updateElection(election),
+                    HttpStatus.ACCEPTED);
+        } else {
+            throw new Election.IdNotFoundException();
+        }
+    }
+
+    @PostMapping("/advance/{electionId}")
+    public ResponseEntity<Election> advanceElection(@PathVariable("electionId") String electionId) {
+        Optional<Election> electionO = electionService.getElectionById(electionId);
+        if(electionO.isPresent()) {
+            Election electionDB = electionO.get();
+            if(electionDB.electionState() == Election.ElectionState.ARCHIVED) {
+                throw new Election.IllegalManipulationException("Status Archived cannot be advanced");}
+            if(electionDB.electionState() == Election.ElectionState.OPEN &&
+                    electionDB.candidateIDs().size() <= electionDB.seats()) {
+                throw new Election.IllegalManipulationException("Election has too few candidates to be opened");}
+            if(electionDB.electionState() == Election.ElectionState.VOTING &&
+                    electionDB.votes().isEmpty()) {
+                throw new Election.IllegalManipulationException("Election has too few votes to be closed");}
+            return new ResponseEntity<>(
+                    electionService.updateElection(electionDB.advance()),
+                    HttpStatus.ACCEPTED);
+        } else {
+            throw new Election.IdNotFoundException();
+        }
+    }
+
+    @PostMapping("/vote/{electionId}")
+    public ResponseEntity<Election> voteElection(@PathVariable("electionId") String electionId, @RequestBody Vote vote) {
+        Optional<Election> electionO = electionService.getElectionById(electionId);
+        if(electionO.isPresent()) {
+            Election electionDB = electionO.get();
+            if(electionDB.electionState() != Election.ElectionState.VOTING) {
+                throw new Election.IllegalManipulationException("Votes cannot be cast in this state");}
+            if(vote.rankingIDs().isEmpty()) {
+                throw new Election.IllegalManipulationException("Vote cannot be empty");}
+            return new ResponseEntity<>(
+                    electionService.updateElection(electionDB.vote(vote)),
+                    HttpStatus.ACCEPTED);
+        } else {
+            throw new Election.IdNotFoundException();
         }
     }
 
@@ -67,6 +123,7 @@ public class ElectionController {
         Optional<Election> electionO = electionService.getElectionById(electionId);
         List<Candidate> allCandidates = electionService.getAllCandidates();
         if(electionO.isPresent()) {
+            if (electionO.get().votes().isEmpty()) throw new Election.IllegalManipulationException("Empty votes cannot be counted");
             List<DetailedResult.ResultItem> result = CountService.getElectionResult(electionO.get(), allCandidates);
             return new ResponseEntity<>(
                     result,
