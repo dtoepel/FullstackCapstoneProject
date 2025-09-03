@@ -1,9 +1,7 @@
 package org.example.backend.controller;
 
 import org.example.backend.model.db.Candidate;
-import org.example.backend.model.db.Election;
 import org.example.backend.repository.CandidateRepo;
-import org.example.backend.repository.ElectionRepo;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,11 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CandidateControllerTest {
+class CandidateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

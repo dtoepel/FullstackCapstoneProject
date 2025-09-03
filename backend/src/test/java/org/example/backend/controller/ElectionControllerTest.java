@@ -20,7 +20,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ElectionControllerTest {
+class ElectionControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -30,7 +30,7 @@ public class ElectionControllerTest {
     @Autowired
     private CandidateRepo candidateRepo;
 
-    Election OPEN_ELECTION = new Election(
+    final Election OPEN_ELECTION = new Election(
             "id1",
             "MyElection",
             "some details",
@@ -41,7 +41,7 @@ public class ElectionControllerTest {
             "Person",
             3);
 
-    Election VOTING_ELECTION = new Election(
+    final Election VOTING_ELECTION = new Election(
             "id2",
             "MyElection",
             "some details",
