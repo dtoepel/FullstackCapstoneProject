@@ -35,3 +35,17 @@ export type STVResultItem = {
     candidateID:string;
     votes:string[];
 }
+
+export function getAllCandidateTypes(candidates : Candidate[]):string[] {
+    const types:string[] = [];
+
+    candidates
+        .filter(candidate => candidate.type)
+        .forEach(candidate => {
+            const index = types.indexOf(candidate.type);
+            if(index < 0) {
+                types.push(candidate.type);
+            }
+        })
+    return types;
+}

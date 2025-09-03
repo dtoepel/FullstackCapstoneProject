@@ -1,5 +1,5 @@
-import type {Candidate, Election} from "./ElectionData.ts";
-import type {FormEvent} from "react";
+import {type Candidate, type Election, getAllCandidateTypes} from "./ElectionData.ts";
+import {type FormEvent} from "react";
 import CandidateBox from "./CandidateBox.tsx";
 import {useNavigate} from "react-router-dom";
 
@@ -14,6 +14,7 @@ export type EditElectionFormProps = {
 
 export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
     const nav = useNavigate();
+    const candidateTypes:string[] = getAllCandidateTypes(props.candidates);
 
     function submit(e:FormEvent<HTMLFormElement> ):void {
         e.preventDefault();
@@ -47,7 +48,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
     function changeType(value:string) {
         const election = {
             ...props.election,
-            electionType:value,
+            candidateType:value,
         }
         props.onEdit(election)
     }
@@ -69,16 +70,17 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
     }
 
     function getAvailableCandidates(election:Election, candidates:Candidate[]) {
-        return candidates.filter((cc) => election.candidateIDs.indexOf(cc.id) == -1);
+        return candidates
+            .filter(candidate => !candidate.archived)
+            .filter(candidate => election.candidateIDs.indexOf(candidate.id) == -1)
+            .filter(candidate => {return election.candidateType===null || election.candidateType==="" || election.candidateType===candidate.type});
     }
 
     function getRunningCandidates(election:Election, candidates:Candidate[]) {
         let result:Candidate[] = [];
         election.candidateIDs.forEach((ecID) => {
-            const c:Candidate[] = candidates.filter((cc) => cc.id == ecID);
+            const c:Candidate[] = candidates.filter((candidate) => candidate.id == ecID);
             if(c.length == 1) {
-                console.log("result: "+result);
-                console.log("c: "+c);
                 result = result.concat(c);
             }
         })
@@ -170,19 +172,28 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                 <tr>
                     <td>Election Method</td>
                     <td>
-                        <select name="candidate-types" id="candidate-types"
+                        <select name="election-types" id="election-types"
                                 onChange={(e) => {changeMethod(e.target.value)}}
                                 defaultValue={props.election.electionMethod}>
                             <option value={"STV"}>STV</option>
-                            <option value={"Test"}>Test</option>
                         </select>
                     </td>
                 </tr>
                 <tr>
                     <td>Candidate Type</td>
                     <td>
-                        <input value={props.election.candidateType}
-                               onChange={(e) => changeType(e.target.value)}/>
+                        {props.election.electionState === "OPEN"?
+                            <select name="candidate-types" id="candidate-types"
+                                    onChange={e => changeType(e.target.value)}>
+                                {candidateTypes.map(type => {
+                                    if(type === props.election.candidateType)
+                                        return(<option value={type} key={"candidate-type-option-"+type} selected>{type}</option>)
+                                    else
+                                        return(<option value={type} key={"candidate-type-option-"+type}>{type}</option>)
+                                })}
+                            </select>
+                        :props.election.candidateType
+                        }
                     </td>
                 </tr>
                 </tbody>

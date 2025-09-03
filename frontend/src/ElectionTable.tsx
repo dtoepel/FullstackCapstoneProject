@@ -1,5 +1,7 @@
 import type {Candidate, Election} from "./ElectionData.ts";
 import CandidateBox from "./CandidateBox.tsx";
+import {useState} from "react";
+import PageSelector from "./img/PageSelector.tsx";
 
 export type ElectionTableProps = {
     elections:Election[];
@@ -15,6 +17,13 @@ export type ElectionTableProps = {
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
+    const [page, setPage] = useState<number>(0);
+    const filteredElections:Election[] = props.elections
+        .filter(election => (election.electionState === "ARCHIVED") === props.isArchive)
+    const itemCount:number = filteredElections.length;
+    const maxItems:number = 4;
+    const maxPages:number = itemCount==0?1:Math.floor((itemCount + maxItems - 1) / maxItems);
+    const electionsOnPage:Election[] = filteredElections.slice(maxItems * page, maxItems * (page+1));
 
     function getDeleteButton(election:Election) {
         return (<button onClick={() => props.onDeleteElection(election)}>Delete</button>)
@@ -34,6 +43,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
             </>)
         } else if(election.electionState==="VOTING") {
             return(<>
+                <button onClick={() => props.onEditElection(election)}>Edit</button>
                 <button onClick={() => props.onCloseVoting(election)}>Close Voting</button>
                 <button><s>Vote</s></button>
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>
@@ -55,7 +65,10 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
 
     return(
         <>
-        {props.isArchive?"":<button onClick={() => props.onCreateElection()}>Create</button>}
+            <div style={{display:"flex", flexDirection:"row"}}>
+                {props.isArchive?"":<button onClick={() => props.onCreateElection()}>Create</button>}
+                <PageSelector page={page} setPage={setPage} maxPages={maxPages}/>
+            </div>
             <table border={1}>
                 <thead>
                 <tr>
@@ -68,8 +81,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                 </tr>
                 </thead>
                 <tbody>
-                {props.elections
-                    .filter(election => (election.electionState === "ARCHIVED") === props.isArchive)
+                {electionsOnPage
                     .map((election) => {
                     let candidates:Candidate[] = [];
                     election.candidateIDs.forEach((id) => {
