@@ -8,9 +8,7 @@ export type ElectionTableProps = {
     candidates:Candidate[];
     onCreateElection:()=>void;
     onEditElection:(election:Election)=>void;
-    onOpenVoting:(election:Election)=>void;
-    onCloseVoting:(election:Election)=>void;
-    onArchiveElection:(election:Election)=>void;
+    onAdvanceElection:(election:Election)=>void;
     onGetResult:(election:Election)=>void;
     onDeleteElection:(election:Election)=>void;
     isArchive:boolean;
@@ -37,14 +35,14 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
         if(election.electionState==="OPEN") {
             return(<>
                 <button onClick={() => props.onEditElection(election)}>Edit</button>
-                <button onClick={() => props.onOpenVoting(election)}>Open Voting</button>
+                <button onClick={() => props.onAdvanceElection(election)}>Open Voting</button>
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="VOTING") {
             return(<>
                 <button onClick={() => props.onEditElection(election)}>Edit</button>
-                <button onClick={() => props.onCloseVoting(election)}>Close Voting</button>
+                <button onClick={() => props.onAdvanceElection(election)}>Close Voting</button>
                 <button><s>Vote</s></button>
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
@@ -52,7 +50,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
         } else if(election.electionState==="CLOSED") {
             return(<>
                 {getResultButton(election)}
-                <button onClick={() => props.onArchiveElection(election)}>Archive</button>
+                <button onClick={() => props.onAdvanceElection(election)}>Archive</button>
                 {getDeleteButton(election)}
             </>)
         } else { // ARCHIVED

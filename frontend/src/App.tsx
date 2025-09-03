@@ -116,23 +116,8 @@ function App() {
             })
     }
 
-    function openVoting(election:Election):void {
-        election.electionState = "VOTING";
-        axios.put("/api/election", election)
-            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
-    }
-
-    function closeVoting(election:Election):void {
-        election.electionState = "CLOSED";
-        axios.put("/api/election", election)
-            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
-    }
-
-    function archiveElection(election:Election):void {
-        election.electionState = "ARCHIVED";
-        axios.put("/api/election", election)
+    function advanceElection(election:Election):void {
+        axios.post("api/election/advance/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => { console.log(error) })
     }
@@ -198,8 +183,7 @@ function App() {
     function submitVote():void {
         const election:Election|null = currentElection
         if(election) {
-            election.votes.push(newVote);
-            axios.put("/api/election", election).then(() => {
+            axios.post("/api/election/vote/" + election.id, newVote).then(() => {
                 setNewVote(defaultVote);
                 setCurrentElection(null);
                 getAllElectionsAndCandidates();
@@ -268,9 +252,7 @@ function App() {
                     })
                     nav("/editElection/")
                 }}
-                onOpenVoting={openVoting}
-                onCloseVoting={closeVoting}
-                onArchiveElection={archiveElection}
+                onAdvanceElection={advanceElection}
                 onDeleteElection={deleteElection}
             />}/>
             <Route path={"/createElection/"} element={<ElectionForm
@@ -341,9 +323,7 @@ function App() {
                     isArchive={true}
                     onCreateElection={() => {}}
                     onEditElection={() => {}}
-                    onOpenVoting={() => {}}
-                    onCloseVoting={() => {}}
-                    onArchiveElection={() => {}}
+                    onAdvanceElection={() => {}}
                     onDeleteElection={deleteElection}
             />}/>
             <Route path={"/result/"} element={<ResultTable
