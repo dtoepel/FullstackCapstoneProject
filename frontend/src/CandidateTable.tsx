@@ -7,14 +7,8 @@ export type CandidateTableProps = {
     elections:Election[];
     onCreateCandidate:()=>void;
     onEditCandidate:(candidate:Candidate)=>void;
-}
-
-function getDeleteButton(candidate:Candidate, elections:Election[]) {
-    const candidateIsInUse:boolean = elections.filter(election => election.candidateIDs.indexOf(candidate.id)>=0).length>0;
-    if(candidateIsInUse)
-        return (<button disabled>Delete</button>)
-    else
-        return (<button disabled><s>Delete</s></button>)
+    onRetireCandidate:(candidate:Candidate)=>void;
+    onDeleteCandidate:(candidate:Candidate)=>void;
 }
 
 export default function CandidateTable(props:Readonly<CandidateTableProps>) {
@@ -27,6 +21,14 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
     const maxItems:number = 12;
     const maxPages:number = itemCount==0?1:Math.floor((itemCount + maxItems - 1) / maxItems);
     const candidatesOnPage:Candidate[] = filteredCandidates.slice(maxItems * page, maxItems * (page+1));
+
+    function getDeleteButton(candidate:Candidate, elections:Election[]) {
+        const candidateIsInUse:boolean = elections.filter(election => election.candidateIDs.indexOf(candidate.id)>=0).length>0;
+        if(candidateIsInUse)
+            return (<button disabled>Delete</button>)
+        else
+            return (<button onClick={() => props.onDeleteCandidate(candidate)}>Delete</button>)
+    }
 
     function filterChanged(e:ChangeEvent<HTMLSelectElement>):void {
         const selectedType = e.target.value;
@@ -69,7 +71,7 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                             <td>{candidate.type}</td>
                             <td>
                                 <button onClick={() => props.onEditCandidate(candidate)}>Edit</button>
-                                <button disabled><s>Retire</s></button>
+                                <button onClick={() => props.onRetireCandidate(candidate)}>Retire</button>
                                 {getDeleteButton(candidate, props.elections)}
                             </td>
                         </tr>
@@ -77,7 +79,6 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                 })}
                 </tbody>
             </table>
-
         </>
     )
 }

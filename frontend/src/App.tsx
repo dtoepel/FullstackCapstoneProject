@@ -20,6 +20,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import AddVoteForm from "./AddVoteForm.tsx";
 import ResultTable from "./ResultTable.tsx";
+import ModalConfirmation from "./ModalConfirmation.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -72,6 +73,9 @@ function App() {
     const [currentElection, setCurrentElection] = useState<Election|null>(null);
     const [newVote, setNewVote] = useState<Vote>(defaultVote)
     const [result, setResult] = useState<STVResultItem[]>([])
+
+    const [confirmDeleteCandidate, setConfirmDeleteCandidate] = useState<Candidate|null>(null)
+    const [confirmRetireCandidate, setConfirmRetireCandidate] = useState<Candidate|null>(null)
 
     // only place to update data
     // could be split to reduce traffic by a small amount
@@ -147,6 +151,16 @@ function App() {
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
                 }
             })
+    }
+
+    function retireCandidate(candidate:Candidate) {
+        updateCandidate({... candidate, archived: true})
+    }
+
+    function deleteCandidate(candidate:Candidate):void {
+        axios.delete("/api/election/candidates" + candidate.id)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => { console.log(error) })
     }
 
     // authorization
@@ -296,6 +310,8 @@ function App() {
                     })
                     nav("/editCandidate/")
                 }}
+                onDeleteCandidate={setConfirmDeleteCandidate}
+                onRetireCandidate={setConfirmRetireCandidate}
             />}/>
             <Route path={"/createCandidate/"} element={<CandidateForm
                 candidate={editCandidateProps.candidate}
@@ -335,6 +351,29 @@ function App() {
             result={result}
             allCandidates={candidates}/>}/>
         </Routes>
+
+        {confirmDeleteCandidate != null && (
+            <ModalConfirmation title={"Confirm Delete "+confirmDeleteCandidate.name}
+                               onClose={() => setConfirmDeleteCandidate(null)}
+                               onConfirm={() => {deleteCandidate(confirmDeleteCandidate);
+                                   setConfirmDeleteCandidate(null)}}>
+                <p>
+                    The candidate {confirmDeleteCandidate.name} will be deleted permanently.
+                </p>
+            </ModalConfirmation>
+        )}
+
+        {confirmRetireCandidate != null && (
+            <ModalConfirmation title={"Confirm Archiving "+confirmRetireCandidate.name}
+                               onClose={() => setConfirmRetireCandidate(null)}
+                               onConfirm={() => {retireCandidate(confirmRetireCandidate);
+                                   setConfirmRetireCandidate(null)}}>
+                <p>
+                    The candidate {confirmRetireCandidate.name} will be archived and can no longer be assigned to elections.
+                </p>
+            </ModalConfirmation>
+        )}
+
     </div>
   )
 }

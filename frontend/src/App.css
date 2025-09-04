@@ -147,3 +147,74 @@ div.ballot > p {
 div.ballot-item  > p {
   margin: 0;
 }
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, .5);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .5);
+  display: grid;
+  place-items: center;
+  z-index: 999;
+}
+
+.modal {
+  width: min(560px, 92vw);
+  background: #fff;
+  color: #111;
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 16px 16px 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
+}
+
+.modal header {
+  font-weight: 600;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 8px;
+}
+
+.modal-close {
+  border: 1px solid transparent;
+  cursor: pointer
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px
+}
+
+.modal-close--icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 18px;
+  background: #d82d2d;
+  color: #ffffff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.modal-close--icon:hover {
+  background: #ff0000
+}
+
+.modal-close--icon:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #bfdbfe
+}
+
+.modal-content {
+  margin-top: 8px;
+}
