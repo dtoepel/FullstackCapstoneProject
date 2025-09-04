@@ -11,6 +11,7 @@ export type ElectionTableProps = {
     onAdvanceElection:(election:Election)=>void;
     onGetResult:(election:Election)=>void;
     onDeleteElection:(election:Election)=>void;
+    onVote:(election:Election)=>void;
     isArchive:boolean;
 }
 
@@ -43,7 +44,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
             return(<>
                 <button onClick={() => props.onEditElection(election)}>Edit</button>
                 <button onClick={() => props.onAdvanceElection(election)}>Close Voting</button>
-                <button><s>Vote</s></button>
+                <button onClick={() => props.onVote(election)}>Vote</button>
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
             </>)
