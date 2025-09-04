@@ -20,7 +20,7 @@ import java.util.List;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class ElectionControllerTest {
+class ElectionControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -30,17 +30,8 @@ public class ElectionControllerTest {
     @Autowired
     private CandidateRepo candidateRepo;
 
-    Candidate defaultCandidate = new Candidate(
-            "1",
-            "John Doe",
-            "Independent",
-            "#444",
-            "some details",
-            "Person",
-            false);
-
-    Election defaultElection = new Election(
-            "1",
+    final Election OPEN_ELECTION = new Election(
+            "id1",
             "MyElection",
             "some details",
             new ArrayList<>(),
@@ -49,21 +40,23 @@ public class ElectionControllerTest {
             Election.ElectionType.STV,
             "Person",
             3);
+
+    final Election VOTING_ELECTION = new Election(
+            "id2",
+            "MyElection",
+            "some details",
+            Arrays.asList("candidate1", "candidate2"),
+            new ArrayList<>(),
+            Election.ElectionState.VOTING,
+            Election.ElectionType.STV,
+            "Person",
+            1);
+
     @Test
-    void getAllProducts() throws Exception {
+    void getAllElections() throws Exception {
 
         //GIVEN
-        Election election = new Election(
-                "1",
-                "MyElection",
-                "some details",
-                new ArrayList<>(),
-                new ArrayList<>(),
-                Election.ElectionState.OPEN,
-                Election.ElectionType.STV,
-                "Person",
-                3);
-        electionRepo.save(election);
+        electionRepo.save(OPEN_ELECTION);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.get("/api/election"))
@@ -73,7 +66,7 @@ public class ElectionControllerTest {
                 """ 
                             [
                               {
-                                "id": "1",
+                                "id": "id1",
                                 "name": "MyElection",
                                 "description": "some details",
                                 "candidateIDs": [],
@@ -91,16 +84,15 @@ public class ElectionControllerTest {
     @Test
     void createElectionSuccess() throws Exception {
         //GIVEN
-        Election existingElection = defaultElection;
         electionRepo.deleteAll();
-        electionRepo.save(existingElection);
+        electionRepo.save(OPEN_ELECTION);
         //WHEN
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "id": "2",
+                                    "id": "id2",
                                     "name": "MyElection",
                                     "description": "some details",
                                     "candidateIDs": [],
@@ -114,7 +106,7 @@ public class ElectionControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json(
                         """ 
                                 {
-                                    "id": "2",
+                                    "id": "id2",
                                     "name": "MyElection",
                                     "description": "some details",
                                     "candidateIDs": [],
@@ -130,16 +122,15 @@ public class ElectionControllerTest {
     @Test
     void createElectionDuplicate() throws Exception {
         //GIVEN
-        Election existingElection = defaultElection;
         electionRepo.deleteAll();
-        electionRepo.save(existingElection);
+        electionRepo.save(OPEN_ELECTION);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "id": "1",
+                                    "id": "id1",
                                     "name": "MyElection",
                                     "description": "some details",
                                     "candidateIDs": [],
@@ -157,16 +148,15 @@ public class ElectionControllerTest {
     @Test
     void updateElectionSuccess() throws Exception {
         //GIVEN
-        Election existingElection = defaultElection;
         electionRepo.deleteAll();
-        electionRepo.save(existingElection);
+        electionRepo.save(OPEN_ELECTION);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "id": "1",
+                                    "id": "id1",
                                     "name": "MyElection",
                                     "description": "some other details",
                                     "candidateIDs": [],
@@ -182,7 +172,7 @@ public class ElectionControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json(
                         """ 
                                 {
-                                    "id": "1",
+                                    "id": "id1",
                                     "name": "MyElection",
                                     "description": "some other details",
                                     "candidateIDs": [],
@@ -198,11 +188,10 @@ public class ElectionControllerTest {
     @Test
     void updateElectionNotFound() throws Exception {
         //GIVEN
-        Election existingElection = defaultElection;
         electionRepo.deleteAll();
-        electionRepo.save(existingElection);
+        electionRepo.save(OPEN_ELECTION);
 
-        //WHE
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -224,128 +213,291 @@ public class ElectionControllerTest {
     }
 
     @Test
-    void getAllCandidates() throws Exception {
-
+    void updateElectionFailVotes() throws Exception {
         //GIVEN
-        Candidate candidate = defaultCandidate;
-        candidateRepo.deleteAll();
-        candidateRepo.save(candidate);
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/candidates"))
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
-                    """ 
-                                [
-                                  {
-                                    "name": "John Doe",
-                                    "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#444",
-                                    "type": "Person",
-                                    "archived": false
-                                  }
-                                ]
-                                """))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
-
-    }
-
-    @Test
-    void createCandidateSuccess() throws Exception {
-        //GIVEN
-
-        //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/candidates")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "name": "John Doe",
+                                    "id": "id2",
+                                    "name": "MyElection",
                                     "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#444",
-                                    "type": "Person",
-                                    "archived": false
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [{"rankingIDs": ["A","B"]}],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
                                 }
                                 """))
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().json(
-                        """ 
-                                {
-                                    "name": "John Doe",
-                                    "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#444",
-                                    "type": "Person",
-                                    "archived": false
-                                }
-                                """))
-                .andExpect(MockMvcResultMatchers.jsonPath("id").isNotEmpty());
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_VOTES));
     }
 
     @Test
-    void updateCandidateSuccess() throws Exception {
+    void updateElectionFailSeats() throws Exception {
         //GIVEN
-        Candidate candidate = defaultCandidate;
-        candidateRepo.deleteAll();
-        candidateRepo.save(candidate);
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "id": "1",
-                                    "name": "Don Joe",
+                                    "id": "id2",
+                                    "name": "MyElection",
                                     "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#555",
-                                    "type": "Person",
-                                    "archived": false
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 3
                                 }
                                 """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_SEATS));
+    }
+
+    @Test
+    void updateElectionFailCandidates() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": ["candidate2", "candidate1"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
+                                }
+                                """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_CANDIDATES));
+    }
+
+    @Test
+    void updateElectionFailType() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "candidateType": "Foo",
+                                    "electionMethod": "STV",
+                                    "seats": 1
+                                }
+                                """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_TYPE));
+    }
+
+    @Test
+    void updateElectionFailMethod() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "VICE",
+                                    "seats": 1
+                                }
+                                """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_METHOD));
+    }
+
+    @Test
+    void updateElectionFailStatus() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "OPEN",
+                                    "votes": [],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
+                                }
+                                """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_STATUS));
+    }
+
+    @Test
+    void advanceElectionFailTooFewCandidates() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(OPEN_ELECTION);
+
+        //WHE
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id1"))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_TOO_FEW_CANDIDATES));
+    }
+
+    @Test
+    void advanceElectionFailTooFewVotes() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHE
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
                 //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_TOO_FEW_VOTES));
+    }
+
+    @Test
+    void advanceElectionSuccessAdvanceToArchived() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION.vote(new Vote(Arrays.asList("A","B"))).advance());
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
+
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isAccepted())
                 .andExpect(MockMvcResultMatchers.content().json(
                         """ 
                                 {
-                                    "id": "1",
-                                    "name": "Don Joe",
-                                    "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#555",
-                                    "type": "Person",
-                                    "archived": false
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "electionState": "ARCHIVED",
+                                    "votes": [{"rankingIDs": ["A","B"]}],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
                                 }
                                 """));
     }
 
     @Test
-    void updateCandidateNotFound() throws Exception {
+    void advanceElectionFailAlreadyArchived() throws Exception {
         //GIVEN
-        Candidate candidate = defaultCandidate;
-        candidateRepo.deleteAll();
-        candidateRepo.save(candidate);
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION.vote(new Vote(Arrays.asList("A","B"))).advance().advance());
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_ALREADY_ARCHIVED));
+    }
+
+    @Test
+    void voteElectionFailWrongState() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(OPEN_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/vote/id1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
-                                    "id": "2",
-                                    "name": "Don Joe",
-                                    "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#555",
-                                    "type": "Person",
-                                    "archived": false
-                                }
-                                """))
+                            {
+                               "rankingIDs": ["A","B"]
+                            }
+                        """))
                 //THEN
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason(Candidate.IdNotFoundException.reason));
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_VOTES_CANNOT_BE_CAST));
+    }
+
+    @Test
+    void voteElectionFailEmpty() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/vote/id2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {
+                               "rankingIDs": []
+                            }
+                        """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_NO_EMPTY_VOTES));
+    }
+
+    @Test
+    void failGetElectionResultsEmpty() throws Exception {
+        //GIVEN
+        Election existingElection = new Election(
+                "myID",
+                "any",
+                "any",
+                Arrays.asList("A", "B"),
+                new ArrayList<>(),
+                Election.ElectionState.CLOSED,
+                Election.ElectionType.STV,
+                "any",
+                1);
+        electionRepo.save(existingElection);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/results/myID"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_COUNT_EMPTY_VOTES));
     }
 
     @Test
@@ -357,7 +509,7 @@ public class ElectionControllerTest {
                 "any",
                 Arrays.asList("A", "B"),
                 List.of(new Vote(List.of("A"))),
-                Election.ElectionState.OPEN,
+                Election.ElectionState.CLOSED,
                 Election.ElectionType.STV,
                 "any",
                 1);
@@ -394,10 +546,10 @@ public class ElectionControllerTest {
     void deleteElectionSuccess() throws Exception {
         //GIVEN
         electionRepo.deleteAll();
-        electionRepo.save(defaultElection);
+        electionRepo.save(OPEN_ELECTION);
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+defaultElection.id()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+OPEN_ELECTION.id()))
 
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -409,7 +561,7 @@ public class ElectionControllerTest {
         electionRepo.deleteAll();
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+defaultElection.id()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+OPEN_ELECTION.id()))
 
         //THEN
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
