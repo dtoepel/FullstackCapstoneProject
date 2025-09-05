@@ -7,7 +7,8 @@
   --myblue:#48f;
   --mydarkblue:#248;
   --mygreen:#385;
-  --myred:#c68;
+  --mylightred:#e8a;
+  --mydarkred:#a00;
   --mydarkgray:#888;
   --mylightgray:#ddd;
 }
@@ -21,12 +22,14 @@ button {
 }
 
 button:disabled{
-   border-radius: 5px;
-   padding: 2px;
-   margin: 2px;
-   color: var(--mydarkgray);
-   background-color: var(--mylightgray);
- }
+  color: var(--mydarkgray);
+  background-color: var(--mylightgray);
+}
+
+button.btn-secondary{
+  color: var(--myblue);
+  background-color: var(--mylightgray);
+}
 
 div.navigation-bar {
   overflow: hidden;
@@ -70,10 +73,10 @@ div.navigation-item > img {
 }
 
 p.error-message {
-  color: #b00;
-  background-color: #faa;
+  color: var(--mydarkred);
+  background-color: var(--mylightred);
   border-radius: 10px;
-  border: 3px #b00 solid;
+  border: 3px var(--mydarkred) solid;
   padding: 10px;
 }
 
@@ -162,37 +165,27 @@ div.ballot-item  > p {
 }
 
 .modal {
-  width: min(560px, 92vw);
+  width: min(360px, 92vw);
   background: #fff;
   color: #111;
   border: 1px solid #333;
-  border-radius: 12px;
-  padding: 16px 16px 20px;
+  border-radius: 14px;
+  padding: 6px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .6);
 }
 
-.modal header {
-  font-weight: 600;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #333;
-  padding-bottom: 8px;
-}
-
-.modal-close {
-  border: 1px solid transparent;
-  cursor: pointer
-}
-
 .modal-header {
+  background-color: var(--myblue);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 8px
+  padding: 4px;
+  border-radius: 8px;
+  min-height: 32px;
 }
 
-.modal-close--icon {
+.modal-close {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,21 +193,22 @@ div.ballot-item  > p {
   height: 32px;
   border-radius: 8px;
   font-size: 18px;
-  background: #d82d2d;
+  background: var(--mydarkblue);
   color: #ffffff;
-  border: 1px solid #ccc;
+  border: 1px solid transparent;
   cursor: pointer;
 }
 
-.modal-close--icon:hover {
-  background: #ff0000
+.modal-close:hover {
+  color: var(--mydarkblue);
+  background: #ffffff;
 }
 
-.modal-close--icon:focus {
+.modal-close:focus {
   outline: none;
   box-shadow: 0 0 0 2px #bfdbfe
 }
 
 .modal-content {
-  margin-top: 8px;
+  margin-top: 0;
 }
