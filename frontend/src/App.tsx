@@ -7,7 +7,7 @@ import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
 
-import type {Candidate, Election, STVResultItem, Vote} from "./ElectionData.ts";
+import type {Candidate, Election, MyError, STVResultItem, Vote} from "./ElectionData.ts";
 
 import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
@@ -17,9 +17,11 @@ import CandidateForm from "./CandidateForm.tsx";
 
 import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import axios from "axios";
+import axios, {type AxiosError} from "axios";
 import AddVoteForm from "./AddVoteForm.tsx";
 import ResultTable from "./ResultTable.tsx";
+import ModalConfirmation from "./ModalConfirmation.tsx";
+import ErrorMessage from "./ErrorMessage.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -73,6 +75,10 @@ function App() {
     const [newVote, setNewVote] = useState<Vote>(defaultVote)
     const [result, setResult] = useState<STVResultItem[]>([])
 
+    const [confirmDeleteCandidate, setConfirmDeleteCandidate] = useState<Candidate|null>(null)
+    const [confirmRetireCandidate, setConfirmRetireCandidate] = useState<Candidate|null>(null)
+    const [error, setError] = useState<MyError>({status:200, message:"test", message2:null})
+
     // only place to update data
     // could be split to reduce traffic by a small amount
     function getAllElectionsAndCandidates():void {
@@ -97,11 +103,10 @@ function App() {
         axios.post("/api/election", editElectionProps.election)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
-                console.log(error);
-                console.log(error.status);
                 if(error.status == 403) {
-                    console.log(error.response.data.message);
                     setEditElectionProps({...editElectionProps, error:error.response.data.message})
+                } else {
+                    handleError(error);
                 }
             })
     }
@@ -110,7 +115,7 @@ function App() {
         axios.put("/api/election", election)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
-                if(error.response && error.response.status == 404) {
+                if(error.response) {
                     setEditElectionProps({...editElectionProps, error:error.response.data.message})
                 }
             })
@@ -119,13 +124,13 @@ function App() {
     function advanceElection(election:Election):void {
         axios.post("api/election/advance/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
+            .catch(error => { handleError(error) })
     }
 
     function deleteElection(election:Election):void {
         axios.delete("/api/election/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
+            .catch(error => { handleError(error) })
     }
 
     function createCandidate(candidate:Candidate):void {
@@ -133,8 +138,9 @@ function App() {
             .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
             .catch(error => {
                 if(error.status == 403) {
-                    console.log(error.response.data.message);
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
+                } else {
+                    handleError(error);
                 }
             })
     }
@@ -143,10 +149,39 @@ function App() {
         axios.put("/api/election/candidates", candidate)
             .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
             .catch(error => {
-                if(error.response && error.response.status == 404) {
+                if(error.response) {
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
                 }
             })
+    }
+
+    function retireCandidate(candidate:Candidate) {
+        axios.put("/api/election/candidates", {... candidate, archived: true})
+            .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
+            .catch(error => { handleError(error) })
+    }
+
+    function deleteCandidate(candidate:Candidate):void {
+        axios.delete("/api/election/candidates/" + candidate.id)
+            .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
+            .catch(error => { handleError(error) })
+    }
+
+    function handleError(error:AxiosError) {
+        const status:number|undefined = error.status;
+        const message:string = error.message;
+
+        console.log("Handling Error: " );
+        console.log(error);
+
+        if(error.response) {
+            const message2:string = (error.response.data as never)["message"]
+            setError({status:status, message:message, message2:message2})
+        } else {
+            setError({status:status, message:message, message2:null})
+        }
+
+        nav("/error/")
     }
 
     // authorization
@@ -173,7 +208,6 @@ function App() {
     function getElectionResults(election:Election):void {
         axios.get("/api/election/results/" + election.id).then(
             (response) => {
-                console.log(response.data)
                 setResult(response.data)
                 nav("/result/")
             }
@@ -189,7 +223,7 @@ function App() {
                 getAllElectionsAndCandidates();
                 nav("/");
             }).catch(error => {
-                console.log(error);
+                handleError(error)
             })
         }
     }
@@ -296,6 +330,8 @@ function App() {
                     })
                     nav("/editCandidate/")
                 }}
+                onDeleteCandidate={setConfirmDeleteCandidate}
+                onRetireCandidate={setConfirmRetireCandidate}
             />}/>
             <Route path={"/createCandidate/"} element={<CandidateForm
                 candidate={editCandidateProps.candidate}
@@ -334,7 +370,32 @@ function App() {
             <Route path={"/result/"} element={<ResultTable
             result={result}
             allCandidates={candidates}/>}/>
+            <Route path={"/error/"} element={
+                <ErrorMessage error={error}/>}/>
         </Routes>
+
+        {confirmDeleteCandidate != null && (
+            <ModalConfirmation title={"Confirm Delete "+confirmDeleteCandidate.name}
+                               onClose={() => setConfirmDeleteCandidate(null)}
+                               onConfirm={() => {deleteCandidate(confirmDeleteCandidate);
+                                   setConfirmDeleteCandidate(null)}}>
+                <p>
+                    The candidate {confirmDeleteCandidate.name} will be deleted permanently.
+                </p>
+            </ModalConfirmation>
+        )}
+
+        {confirmRetireCandidate != null && (
+            <ModalConfirmation title={"Confirm Archiving "+confirmRetireCandidate.name}
+                               onClose={() => setConfirmRetireCandidate(null)}
+                               onConfirm={() => {retireCandidate(confirmRetireCandidate);
+                                   setConfirmRetireCandidate(null)}}>
+                <p>
+                    The candidate {confirmRetireCandidate.name} will be archived and can no longer be assigned to elections.
+                </p>
+            </ModalConfirmation>
+        )}
+
     </div>
   )
 }

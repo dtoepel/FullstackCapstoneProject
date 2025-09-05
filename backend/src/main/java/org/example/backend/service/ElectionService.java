@@ -29,6 +29,8 @@ public class ElectionService {
     public Candidate createCandidate(Candidate candidate) { return candidateRepo.save(candidate); }
     public Candidate updateCandidate(Candidate candidate) { return candidateRepo.save(candidate); }
 
+    public Optional<Candidate> getCandidateById(String id) { return candidateRepo.findById(id); }
+
     public boolean deleteElection(String electionId) {
         Optional<Election> response = electionRepo.findById(electionId);
         if(response.isPresent()) {
@@ -37,4 +39,14 @@ public class ElectionService {
         }
         return false;
     }
+
+    public boolean deleteCandidate(String candidateId) {
+        Optional<Candidate> response = candidateRepo.findById(candidateId);
+        if(response.isPresent()) {
+            candidateRepo.deleteById(candidateId);
+            return true;
+        }
+        return false;
+    }
+
 }
