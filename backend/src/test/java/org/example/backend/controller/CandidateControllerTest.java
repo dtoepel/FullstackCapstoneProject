@@ -160,7 +160,7 @@ class CandidateControllerTest {
         candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+ DEFAULT_CANDIDATE.id()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/candidates/"+ DEFAULT_CANDIDATE.id()))
 
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -172,7 +172,7 @@ class CandidateControllerTest {
         candidateRepo.deleteAll();
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+ DEFAULT_CANDIDATE.id()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/candidates/"+ DEFAULT_CANDIDATE.id()))
 
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
