@@ -234,6 +234,10 @@ function App() {
                 candidates={candidates}
                 onGetResult={getElectionResults}
                 isArchive={false}
+                onVote={(election) => {
+                    setCurrentElection(election); setNewVote(defaultVote);
+                    nav("/vote/")
+                }}
                 onCreateElection={() => {
                     setEditElectionProps({
                         election:defaultElection,
@@ -324,6 +328,7 @@ function App() {
                     onCreateElection={() => {}}
                     onEditElection={() => {}}
                     onAdvanceElection={() => {}}
+                    onVote={() => {}}
                     onDeleteElection={deleteElection}
             />}/>
             <Route path={"/result/"} element={<ResultTable

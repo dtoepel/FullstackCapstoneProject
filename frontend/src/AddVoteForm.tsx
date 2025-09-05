@@ -56,6 +56,19 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
         }
     }
 
+    function getElectionSelector() {
+        return(
+            <select id={"selectElection"} onChange={electionChanged}>
+                {props.allElections.map(election => {
+                    if (election == props.election) return (
+                        <option value={election.id} key={election.id} selected>{election.name}</option>)
+                    else return (
+                        <option value={election.id} key={election.id}>{election.name}</option>)
+                })}
+            </select>
+        )
+    }
+
     function electionChanged(event:ChangeEvent<HTMLSelectElement>):void {
         const matchingElections = props.allElections.filter(election => election.id===event.target.value)
         if(matchingElections.length == 1) {
@@ -84,12 +97,13 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
     }
     ballotNo = ballotNo.substring(0,2)+"-"+ ballotNo.substring(2,3)+"-"+ ballotNo.substring(3,5)
 
+    if(props.election == null && props.allElections.length>0) {
+        const election = props.allElections.at(0);
+        if(election) props.setElection(election);
+    }
+
     return(<>
-            <select id={"selectElection"} onChange={electionChanged}>
-            {props.allElections.map(election => {
-                return( <option value={election.id} key={election.id}>{election.name}</option>
-                )})}
-            </select>
+            {getElectionSelector()}
             <div className={"ballot"} style={{maxWidth:"min(500px,95vw)"}}>
                 <p style={{fontWeight:"bold",fontSize:"48px",color:"var(--mydarkblue)"}}>Ballot</p>
                 <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
