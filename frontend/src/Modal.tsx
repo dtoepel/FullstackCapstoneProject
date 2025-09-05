@@ -15,11 +15,14 @@ export default function Modal({title, onClose, children}: Readonly<ModalProps>) 
 
     useEffect(() => {
         const dlg = dlgRef.current;
+
         if (!dlg) return;
-            if (!dlg.open) dlg.showModal();
-            const onCancel = (e: Event) => { e.preventDefault(); onClose(); };
-            dlg.addEventListener("cancel", onCancel);
-            return () => dlg.removeEventListener("cancel", onCancel);
+
+        if (!dlg.open) dlg.showModal();
+
+        const onCancel = (e: Event) => { e.preventDefault(); onClose(); };
+        dlg.addEventListener("cancel", onCancel);
+        return () => dlg.removeEventListener("cancel", onCancel);
 
     }, [onClose]);
 
