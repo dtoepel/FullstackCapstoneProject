@@ -7,7 +7,7 @@ import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
 
-import type {Candidate, Election, STVResultItem, Vote} from "./ElectionData.ts";
+import type {Candidate, Election, MyError, STVResultItem, Vote} from "./ElectionData.ts";
 
 import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
@@ -17,10 +17,11 @@ import CandidateForm from "./CandidateForm.tsx";
 
 import {Route, Routes, useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import axios from "axios";
+import axios, {type AxiosError} from "axios";
 import AddVoteForm from "./AddVoteForm.tsx";
 import ResultTable from "./ResultTable.tsx";
 import ModalConfirmation from "./ModalConfirmation.tsx";
+import ErrorMessage from "./ErrorMessage.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -76,6 +77,7 @@ function App() {
 
     const [confirmDeleteCandidate, setConfirmDeleteCandidate] = useState<Candidate|null>(null)
     const [confirmRetireCandidate, setConfirmRetireCandidate] = useState<Candidate|null>(null)
+    const [error, setError] = useState<MyError>({status:200, message:"test", message2:null})
 
     // only place to update data
     // could be split to reduce traffic by a small amount
@@ -160,7 +162,23 @@ function App() {
     function deleteCandidate(candidate:Candidate):void {
         axios.delete("/api/election/candidates" + candidate.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
+            .catch(error => { handleError(error) })
+    }
+
+    function handleError(error:AxiosError) {
+        const status:number|undefined = error.status;
+        const message:string = error.message;
+
+        console.log(error);
+
+        if(error.response) {
+            const message2:string = (error.response.data as never)["message"]
+            setError({status:status, message:message, message2:message2})
+        } else {
+            setError({status:status, message:message, message2:null})
+        }
+
+        nav("/error/")
     }
 
     // authorization
@@ -203,7 +221,7 @@ function App() {
                 getAllElectionsAndCandidates();
                 nav("/");
             }).catch(error => {
-                console.log(error);
+                handleError(error)
             })
         }
     }
@@ -350,6 +368,8 @@ function App() {
             <Route path={"/result/"} element={<ResultTable
             result={result}
             allCandidates={candidates}/>}/>
+            <Route path={"/error/"} element={
+                <ErrorMessage error={error}/>}/>
         </Routes>
 
         {confirmDeleteCandidate != null && (
