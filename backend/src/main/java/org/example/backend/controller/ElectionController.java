@@ -160,13 +160,19 @@ public class ElectionController {
 
     @PutMapping("/candidates")
     public ResponseEntity<Candidate> updateCandidate(@RequestBody Candidate candidate) {
-        List<Candidate> allCandidates = electionService.getAllCandidates();
-        if(allCandidates.stream().filter(candidateDB -> candidateDB.id().equals(candidate.id())).toList().isEmpty()) {
+        Optional<Candidate> candidateDB =  electionService.getCandidateById(candidate.id());
+        if(candidateDB.isEmpty()) {
             throw new Candidate.IdNotFoundException();
         } else {
             return new ResponseEntity<>(
                     electionService.updateCandidate(candidate),
                     HttpStatus.ACCEPTED);
         }
+    }
+
+    @DeleteMapping("/candidates/{candidateID}")
+    public void deleteCandidate(@PathVariable String candidateID) {
+        if(!electionService.deleteCandidate(candidateID))
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Object does not exist");
     }
 }
