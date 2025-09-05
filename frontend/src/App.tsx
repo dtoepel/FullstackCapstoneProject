@@ -103,11 +103,10 @@ function App() {
         axios.post("/api/election", editElectionProps.election)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
-                console.log(error);
-                console.log(error.status);
                 if(error.status == 403) {
-                    console.log(error.response.data.message);
                     setEditElectionProps({...editElectionProps, error:error.response.data.message})
+                } else {
+                    handleError(error);
                 }
             })
     }
@@ -116,7 +115,7 @@ function App() {
         axios.put("/api/election", election)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => {
-                if(error.response && error.response.status == 404) {
+                if(error.response) {
                     setEditElectionProps({...editElectionProps, error:error.response.data.message})
                 }
             })
@@ -125,13 +124,13 @@ function App() {
     function advanceElection(election:Election):void {
         axios.post("api/election/advance/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
+            .catch(error => { handleError(error) })
     }
 
     function deleteElection(election:Election):void {
         axios.delete("/api/election/" + election.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
-            .catch(error => { console.log(error) })
+            .catch(error => { handleError(error) })
     }
 
     function createCandidate(candidate:Candidate):void {
@@ -139,8 +138,9 @@ function App() {
             .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
             .catch(error => {
                 if(error.status == 403) {
-                    console.log(error.response.data.message);
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
+                } else {
+                    handleError(error);
                 }
             })
     }
@@ -149,18 +149,20 @@ function App() {
         axios.put("/api/election/candidates", candidate)
             .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
             .catch(error => {
-                if(error.response && error.response.status == 404) {
+                if(error.response) {
                     setEditCandidateProps({...editCandidateProps, error:error.response.data.message})
                 }
             })
     }
 
     function retireCandidate(candidate:Candidate) {
-        updateCandidate({... candidate, archived: true})
+        axios.put("/api/election/candidates", {... candidate, archived: true})
+            .then(() => {getAllElectionsAndCandidates(); editCandidateProps.onSuccess()})
+            .catch(error => { handleError(error) })
     }
 
     function deleteCandidate(candidate:Candidate):void {
-        axios.delete("/api/election/candidates" + candidate.id)
+        axios.delete("/api/election/candidates/" + candidate.id)
             .then(() => {getAllElectionsAndCandidates(); editElectionProps.onSuccess()})
             .catch(error => { handleError(error) })
     }
@@ -169,6 +171,7 @@ function App() {
         const status:number|undefined = error.status;
         const message:string = error.message;
 
+        console.log("Handling Error: " );
         console.log(error);
 
         if(error.response) {
@@ -205,7 +208,6 @@ function App() {
     function getElectionResults(election:Election):void {
         axios.get("/api/election/results/" + election.id).then(
             (response) => {
-                console.log(response.data)
                 setResult(response.data)
                 nav("/result/")
             }
