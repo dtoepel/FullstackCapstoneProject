@@ -21,7 +21,7 @@ class CandidateControllerTest {
     @Autowired
     private CandidateRepo candidateRepo;
 
-    Candidate defaultCandidate = new Candidate(
+    private final Candidate DEFAULT_CANDIDATE = new Candidate(
             "1",
             "John Doe",
             "Independent",
@@ -34,9 +34,8 @@ class CandidateControllerTest {
     void getAllCandidates() throws Exception {
 
         //GIVEN
-        Candidate candidate = defaultCandidate;
         candidateRepo.deleteAll();
-        candidateRepo.save(candidate);
+        candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.get("/api/election/candidates"))
@@ -95,9 +94,8 @@ class CandidateControllerTest {
     @Test
     void updateCandidateSuccess() throws Exception {
         //GIVEN
-        Candidate candidate = defaultCandidate;
         candidateRepo.deleteAll();
-        candidateRepo.save(candidate);
+        candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
@@ -132,9 +130,8 @@ class CandidateControllerTest {
     @Test
     void updateCandidateNotFound() throws Exception {
         //GIVEN
-        Candidate candidate = defaultCandidate;
         candidateRepo.deleteAll();
-        candidateRepo.save(candidate);
+        candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
@@ -154,4 +151,31 @@ class CandidateControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.status().reason(Candidate.IdNotFoundException.reason));
     }
+
+
+    @Test
+    void deleteCandidateSuccess() throws Exception {
+        //GIVEN
+        candidateRepo.deleteAll();
+        candidateRepo.save(DEFAULT_CANDIDATE);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+ DEFAULT_CANDIDATE.id()))
+
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+    @Test
+
+    void deleteCandidateFail() throws Exception {
+        //GIVEN
+        candidateRepo.deleteAll();
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+ DEFAULT_CANDIDATE.id()))
+
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
 }
