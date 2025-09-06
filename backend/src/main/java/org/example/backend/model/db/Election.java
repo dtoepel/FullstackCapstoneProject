@@ -65,19 +65,19 @@ public record Election(
     }
     public enum ElectionType {STV, VICE}
 
-    @ResponseStatus(value=HttpStatus.FORBIDDEN, reason=DuplicateIdException.reason)
+    @ResponseStatus(value=HttpStatus.FORBIDDEN, reason=DuplicateIdException.REASON)
     public static class DuplicateIdException extends RuntimeException {
-        public static final String reason = "Duplicate ID";
+        public static final String REASON = "Duplicate ID";
     }
 
-    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason=IdNotFoundException.reason)
+    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason=IdNotFoundException.REASON)
     public static class IdNotFoundException extends RuntimeException {
-        public static final String reason = "ID not found";
+        public static final String REASON = "ID not found";
     }
 
-    @ResponseStatus(value=HttpStatus.UNAUTHORIZED, reason=VoteNotAuthorizedException.reason)
+    @ResponseStatus(value=HttpStatus.UNAUTHORIZED, reason=VoteNotAuthorizedException.REASON)
     public static class VoteNotAuthorizedException extends RuntimeException {
-        public static final String reason = "Validation code not accepted";
+        public static final String REASON = "Validation code not accepted";
     }
 
     public static class IllegalManipulationException extends ResponseStatusException {
