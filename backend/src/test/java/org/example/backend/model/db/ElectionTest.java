@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ElectionTest {
 
     private final Election DEFAULT_ELECTION = new Election("id", "name", "description",
-            List.of("candidateId"), new ArrayList<>(), Election.ElectionState.VOTING, Election.ElectionType.STV,
+            List.of("candidateId"), new ArrayList<>(), new ArrayList<>(), Election.ElectionState.VOTING, Election.ElectionType.STV,
             "Person", 2);
 
     @Test

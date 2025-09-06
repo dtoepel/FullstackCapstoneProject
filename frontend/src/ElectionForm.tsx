@@ -16,7 +16,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
     const nav = useNavigate();
     const candidateTypes:string[] = getAllCandidateTypes(props.candidates);
 
-    function submit(e:FormEvent<HTMLFormElement> ):void {
+    function submit(e:FormEvent<HTMLFormElement>):void {
         e.preventDefault();
         props.onSubmit();
     }
@@ -69,6 +69,15 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
         props.onEdit(election)
     }
 
+    function changeEmails(value:string) {
+        const voterEmailsArray:string[] = value.split(",");
+        const election = {
+            ...props.election,
+            voterEmails:voterEmailsArray,
+        }
+        props.onEdit(election)
+    }
+
     function getAvailableCandidates(election:Election, candidates:Candidate[]) {
         return candidates
             .filter(candidate => !candidate.archived)
@@ -85,6 +94,43 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
             }
         })
         return result;
+    }
+
+    function csv(a:string[]):string {
+        if(a == null) return "";
+        if(a.length==0) return "";
+        let s:string = "";
+        a.map(item => {s += "," + item});
+        return s.substring(1);
+    }
+
+    function getInvalid(a:string[]):string {
+        if(a == null) return "";
+        let s:string = "";
+        a.map(item => {
+            if(!item.match("^(?![_.-])((?![_.-][_.-])[a-zA-Z\\d_.-]){0,63}[a-zA-Z\\d]@((?!-)((?!--)[a-zA-Z\\d-]){0,63}[a-zA-Z\\d]\\.){1,2}([a-zA-Z]{2,14}\\.)?[a-zA-Z]{2,14}$"))
+            s += "," + item});
+
+        if(s.length==0) return "";
+        return s.substring(1);
+    }
+
+    function getInvalidRow(emails:string[]) {
+        const invalid:string = getInvalid(emails);
+        if(invalid == "") {
+            return ("");
+        } else {
+            return(
+                <tr>
+                    <td>invalid Emails</td>
+                    <td>
+                        <p className={"error-message"}>{
+                            invalid
+                        }</p>
+                    </td>
+                </tr>
+            )
+        }
     }
 
     const candidatesEditable:boolean = props.election.electionState=="OPEN";
@@ -157,7 +203,8 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                     <td>Description</td>
                     <td>
                         <textarea value={props.election.description}
-                                  onChange={(e) => changeDescription(e.target.value)}/>
+                                  onChange={(e) => changeDescription(e.target.value)}
+                                  style={{width:"min(400px,60vw)",height:"80px"}}/>
                     </td>
                 </tr>
                 <tr>
@@ -196,6 +243,16 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                         }
                     </td>
                 </tr>
+                <tr>
+                    <td>Voter Emails<br/>
+                        as CSV</td>
+                    <td>
+                        <textarea value={csv(props.election.voterEmails)}
+                                  onChange={(e) => changeEmails(e.target.value)}
+                                  style={{width:"min(400px,60vw)",height:"80px"}}/>
+                    </td>
+                </tr>
+                {getInvalidRow(props.election.voterEmails)}
                 </tbody>
             </table>
             <table>

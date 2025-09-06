@@ -41,6 +41,7 @@ public class ElectionController {
                         init.description(),
                         init.candidateIDs(),
                         new ArrayList<>(),
+                        init.voterEmails(),
                         Election.ElectionState.OPEN,
                         init.electionMethod(),
                         init.candidateType(),
@@ -76,6 +77,8 @@ public class ElectionController {
             throw new Election.IllegalManipulationException(MSG_CANNOT_CHANGE_METHOD);
         if (electionDB.seats() != (election.seats()))
             throw new Election.IllegalManipulationException(MSG_CANNOT_CHANGE_SEATS);
+        if (electionDB.voterEmails() != (election.voterEmails()))
+            throw new Election.IllegalManipulationException(MSG_CANNOT_CHANGE_VOTERS);
 
         // No checks have failed, now the remaining cases (!= OPEN) can be updated
         return new ResponseEntity<>(
@@ -86,23 +89,9 @@ public class ElectionController {
 
     @PostMapping("/advance/{electionId}")
     public ResponseEntity<Election> advanceElection(@PathVariable("electionId") String electionId) {
-        Optional<Election> electionO = electionService.getElectionById(electionId);
-        if(electionO.isPresent()) {
-            Election electionDB = electionO.get();
-            if(electionDB.electionState() == Election.ElectionState.ARCHIVED) {
-                throw new Election.IllegalManipulationException(MSG_ALREADY_ARCHIVED);}
-            if(electionDB.electionState() == Election.ElectionState.OPEN &&
-                    electionDB.candidateIDs().size() <= electionDB.seats()) {
-                throw new Election.IllegalManipulationException(MSG_TOO_FEW_CANDIDATES);}
-            if(electionDB.electionState() == Election.ElectionState.VOTING &&
-                    electionDB.votes().isEmpty()) {
-                throw new Election.IllegalManipulationException(MSG_TOO_FEW_VOTES);}
-            return new ResponseEntity<>(
-                    electionService.updateElection(electionDB.advance()),
-                    HttpStatus.ACCEPTED);
-        } else {
-            throw new Election.IdNotFoundException();
-        }
+        return new ResponseEntity<>(
+            electionService.advanceElection(electionId),
+            HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/vote/{electionId}")

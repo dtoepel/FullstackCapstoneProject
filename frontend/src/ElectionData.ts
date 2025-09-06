@@ -8,6 +8,7 @@ export type Election = {
     candidateType:string;
     electionMethod:string;
     votes:Vote[];
+    voterEmails:string[];
 }
 
 export type Vote = {

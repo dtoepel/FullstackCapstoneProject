@@ -2,8 +2,10 @@ package org.example.backend.service;
 
 import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Election;
+import org.example.backend.model.db.Voter;
 import org.example.backend.repository.CandidateRepo;
 import org.example.backend.repository.ElectionRepo;
+import org.example.backend.repository.VoterRepo;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -22,6 +24,7 @@ class ElectionServiceTest {
                 "some details",
                 new ArrayList<>(),
                 new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.OPEN,
                 Election.ElectionType.STV,
                 "Person",
@@ -33,7 +36,9 @@ class ElectionServiceTest {
         // GIVEN
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        VoterRepo voterRepo = Mockito.mock(VoterRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo, voterRepo);
+
         Election election = getDefaultElection();
 
         // WHEN
@@ -53,7 +58,9 @@ class ElectionServiceTest {
         //GIVEN
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        VoterRepo voterRepo = Mockito.mock(VoterRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo, voterRepo);
+
         Election election = getDefaultElection();
 
         //WHEN
@@ -70,10 +77,11 @@ class ElectionServiceTest {
     @Test
     void getAllCandidates() {
         //GIVEN
-
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        VoterRepo voterRepo = Mockito.mock(VoterRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo, voterRepo);
+
         Candidate candidate = new Candidate(
                 "-1",
                 "John Doe",
@@ -101,7 +109,9 @@ class ElectionServiceTest {
         //GIVEN
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        VoterRepo voterRepo = Mockito.mock(VoterRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo, voterRepo);
+
         Candidate candidate = new Candidate(
                 "-1",
                 "John Doe",
@@ -128,7 +138,9 @@ class ElectionServiceTest {
         //GIVEN
         ElectionRepo electionRepo = Mockito.mock(ElectionRepo.class);
         CandidateRepo candidateRepo = Mockito.mock(CandidateRepo.class);
-        ElectionService electionService = new ElectionService(electionRepo, candidateRepo);
+        VoterRepo voterRepo = Mockito.mock(VoterRepo.class);
+        ElectionService electionService = new ElectionService(electionRepo, candidateRepo, voterRepo);
+
         Election election = getDefaultElection();
 
         //WHEN
