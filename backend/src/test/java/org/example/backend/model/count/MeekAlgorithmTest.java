@@ -55,6 +55,7 @@ class MeekAlgorithmTest {
                 "any", "any", "any",
                 Arrays.asList("A", "B", "C"),
                 votes,
+                new ArrayList<>(),
                 Election.ElectionState.CLOSED,
                 Election.ElectionType.STV,
                 "any",

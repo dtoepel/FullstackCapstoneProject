@@ -22,6 +22,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
     const itemCount:number = filteredElections.length;
     const maxItems:number = 4;
     const maxPages:number = itemCount==0?1:Math.floor((itemCount + maxItems - 1) / maxItems);
+    if(page >= maxPages) setPage(0);
     const electionsOnPage:Election[] = filteredElections.slice(maxItems * page, maxItems * (page+1));
 
     function getDeleteButton(election:Election) {

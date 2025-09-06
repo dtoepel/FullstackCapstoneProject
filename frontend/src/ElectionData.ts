@@ -8,10 +8,12 @@ export type Election = {
     candidateType:string;
     electionMethod:string;
     votes:Vote[];
+    voterEmails:string[];
 }
 
 export type Vote = {
     rankingIDs:string[];
+    validationCode:string;
 }
 
 export type Candidate = {
@@ -22,13 +24,6 @@ export type Candidate = {
     color:string;
     type:string;
     archived:boolean;
-}
-
-export type ElectionResultItem = {
-    candidate:Candidate;
-    firstVotes:string;
-    elected:boolean;
-    electedAs:string;
 }
 
 export type STVResultItem = {
@@ -48,4 +43,10 @@ export function getAllCandidateTypes(candidates : Candidate[]):string[] {
             }
         })
     return types;
+}
+
+export type MyError = {
+    status:number|undefined;
+    message:string;
+    message2:string|null;
 }

@@ -36,6 +36,7 @@ class ElectionControllerTest {
             "some details",
             new ArrayList<>(),
             new ArrayList<>(),
+            new ArrayList<>(),
             Election.ElectionState.OPEN,
             Election.ElectionType.STV,
             "Person",
@@ -47,6 +48,7 @@ class ElectionControllerTest {
             "some details",
             Arrays.asList("candidate1", "candidate2"),
             new ArrayList<>(),
+            Arrays.asList("voter1@example.com", "voter2@example.com"),
             Election.ElectionState.VOTING,
             Election.ElectionType.STV,
             "Person",
@@ -369,7 +371,35 @@ class ElectionControllerTest {
                                     "seats": 1
                                 }
                                 """))
-        //THEN
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_STATUS));
+    }
+
+    @Test
+    void updateElectionFailVoters() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "OPEN",
+                                    "votes": [],
+                                    "voterEmails": ["voter3@example.com"],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
+                                }
+                                """))
+                //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_STATUS));
     }
@@ -486,6 +516,7 @@ class ElectionControllerTest {
                 "any",
                 Arrays.asList("A", "B"),
                 new ArrayList<>(),
+                new ArrayList<>(),
                 Election.ElectionState.CLOSED,
                 Election.ElectionType.STV,
                 "any",
@@ -509,6 +540,7 @@ class ElectionControllerTest {
                 "any",
                 Arrays.asList("A", "B"),
                 List.of(new Vote(List.of("A"))),
+                new ArrayList<>(),
                 Election.ElectionState.CLOSED,
                 Election.ElectionType.STV,
                 "any",
