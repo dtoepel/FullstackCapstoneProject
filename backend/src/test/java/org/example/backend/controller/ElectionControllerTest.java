@@ -410,13 +410,50 @@ class ElectionControllerTest {
     }
 
     @Test
+    void advanceOpenElectionSuccess() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        voterRepo.deleteAll();
+        electionRepo.save(new Election(
+                OPEN_ELECTION.id(), OPEN_ELECTION.name(), OPEN_ELECTION.description(),
+                Arrays.asList("cId1", "cId2", "cId3"), OPEN_ELECTION.votes(),
+                Arrays.asList("voter1@example.com", "voter2@example.com"),
+                OPEN_ELECTION.electionState(), OPEN_ELECTION.electionMethod(),
+                OPEN_ELECTION.candidateType(), 2));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id1"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isAccepted());
+
+        assertEquals(2, voterRepo.findAll().size());
+        assertEquals(Election.ElectionState.VOTING, electionRepo.findById("id1").orElseThrow().electionState());
+    }
+
+    @Test
+    void advanceElectionFailNotFound() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(OPEN_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.REASON));
+    }
+
+    @Test
     void advanceElectionFailTooFewCandidates() throws Exception {
         //GIVEN
         electionRepo.deleteAll();
         electionRepo.save(OPEN_ELECTION);
 
-        //WHE
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id1"))
+
         //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_TOO_FEW_CANDIDATES));
@@ -428,9 +465,10 @@ class ElectionControllerTest {
         electionRepo.deleteAll();
         electionRepo.save(VOTING_ELECTION);
 
-        //WHE
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
-                //THEN
+
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_TOO_FEW_VOTES));
     }
@@ -509,7 +547,7 @@ class ElectionControllerTest {
                                "validationCode" : "IRRELEVANT"
                             }
                         """))
-                //THEN
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_NO_EMPTY_VOTES));
     }
@@ -529,7 +567,7 @@ class ElectionControllerTest {
                                "validationCode" : "IRRELEVANT"
                             }
                         """))
-                //THEN
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.VoteNotAuthorizedException.REASON));
     }
@@ -550,7 +588,7 @@ class ElectionControllerTest {
                                "validationCode" : "ABCDEF"
                             }
                         """))
-                //THEN
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
         assertTrue(voterRepo.findAll().isEmpty());
