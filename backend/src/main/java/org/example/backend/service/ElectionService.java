@@ -4,8 +4,6 @@ import org.example.backend.model.db.*;
 import org.example.backend.repository.CandidateRepo;
 import org.example.backend.repository.ElectionRepo;
 import org.example.backend.repository.VoterRepo;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -85,9 +83,9 @@ public class ElectionService {
             if(vote.rankingIDs().isEmpty()) {
                 throw new Election.IllegalManipulationException(MSG_NO_EMPTY_VOTES);}
             List<Voter> allVoters = voterRepo.findAll();
-            List<Voter> validVoters = allVoters.stream().filter(voter -> {return
+            List<Voter> validVoters = allVoters.stream().filter(voter ->
                     electionDB.id().equals(voter.electionID()) &&
-                    voter.validationCode().equals(vote.validationCode());}).toList();
+                    voter.validationCode().equals(vote.validationCode())).toList();
             if(validVoters.isEmpty()) {
                 throw new Election.VoteNotAuthorizedException();
             } else {

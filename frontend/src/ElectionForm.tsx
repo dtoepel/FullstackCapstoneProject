@@ -108,7 +108,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
         if(a == null) return "";
         let s:string = "";
         a.forEach(item => {
-            if(!(new RegExp("^(?![_.-])((?![_.-][_.-])[a-zA-Z\\d_.-]){0,63}[a-zA-Z\\d]@((?!-)((?!--)[a-zA-Z\\d-]){0,63}[a-zA-Z\\d]\\.){1,2}([a-zA-Z]{2,14}\\.)?[a-zA-Z]{2,14}$").exec(item)))
+            if(!(/^(?![_.-])((?![_.-][_.-])[a-zA-Z\\d_.-]){0,63}[a-zA-Z\\d]@((?!-)((?!--)[a-zA-Z\\d-]){0,63}[a-zA-Z\\d]\\.){1,2}([a-zA-Z]{2,14}\\.)?[a-zA-Z]{2,14}$/.exec(item)))
             s += "," + item});
 
         if(s.length==0) return "";

@@ -391,7 +391,7 @@ class ElectionControllerTest {
                                     "name": "MyElection",
                                     "description": "some details",
                                     "candidateIDs": ["candidate1", "candidate2"],
-                                    "electionState": "OPEN",
+                                    "electionState": "VOTING",
                                     "votes": [],
                                     "voterEmails": ["voter3@example.com"],
                                     "candidateType": "Person",
@@ -401,7 +401,7 @@ class ElectionControllerTest {
                                 """))
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_STATUS));
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_VOTERS));
     }
 
     @Test
