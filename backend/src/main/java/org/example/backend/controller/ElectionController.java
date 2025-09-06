@@ -95,20 +95,10 @@ public class ElectionController {
     }
 
     @PostMapping("/vote/{electionId}")
-    public ResponseEntity<Election> voteElection(@PathVariable("electionId") String electionId, @RequestBody Vote vote) {
-        Optional<Election> electionO = electionService.getElectionById(electionId);
-        if(electionO.isPresent()) {
-            Election electionDB = electionO.get();
-            if(electionDB.electionState() != Election.ElectionState.VOTING) {
-                throw new Election.IllegalManipulationException(MSG_VOTES_CANNOT_BE_CAST);}
-            if(vote.rankingIDs().isEmpty()) {
-                throw new Election.IllegalManipulationException(MSG_NO_EMPTY_VOTES);}
-            return new ResponseEntity<>(
-                    electionService.updateElection(electionDB.vote(vote)),
-                    HttpStatus.ACCEPTED);
-        } else {
-            throw new Election.IdNotFoundException();
-        }
+    public void voteElection(
+            @PathVariable("electionId") String electionId,
+            @RequestBody VoteDTO vote) {
+        electionService.vote(electionId, vote);
     }
 
     @GetMapping("/results/{electionId}")

@@ -65,4 +65,29 @@ class ElectionTest {
         //THEN
         assertThrows(Exception.class, () -> f.vote(new Vote(Arrays.asList("C", "D"))));
     }
+
+    @Test
+    void createVoters() {
+        //GIVEN
+        Election e = new Election("id", "name", "description",
+                List.of("candidateId1", "candidateId2"), new ArrayList<>(),
+                List.of("voter1@example.com", "voter2@example.com", "voter3@example.com"),
+                Election.ElectionState.OPEN, Election.ElectionType.STV,
+                "Person", 1);
+
+        //WHEN
+        List<Voter> voters = e.createVoterCodes();
+
+        //THEN
+        assertEquals(3, voters.size());
+        for(Voter v : voters) {
+            assertTrue(v.validationCode().matches("^[B-DF-HJ-NP-TV-Z1-9]{6}$"));
+            assertEquals(e.id(),v.electionID());
+            assertTrue(e.voterEmails().contains(v.email()));
+        }
+        for(String email : e.voterEmails()) {
+            assertTrue(voters.stream().anyMatch(v -> v.email().equals(email)));
+        }
+
+    }
 }

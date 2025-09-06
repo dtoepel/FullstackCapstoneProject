@@ -30,14 +30,14 @@ public record Election(
         return new Election(id, name, description, candidateIDs, votes, voterEmails, electionState, electionMethod, candidateType, seats);
     }
 
-    public Iterable<Voter> createVoterCodes() {
+    public List<Voter> createVoterCodes() {
         ArrayList<Voter> voters = new ArrayList<>();
         SecureRandom random = new SecureRandom();
 
         for(String voterEmail : voterEmails) {
             if(!"".equals(voterEmail)) {
                 String randomCode = getRandomCode(random);
-                voters.add(new Voter(voterEmail, id, randomCode));
+                voters.add(new Voter(null, voterEmail, id, randomCode));
             }
         }
         return voters;
@@ -73,6 +73,11 @@ public record Election(
     @ResponseStatus(value=HttpStatus.NOT_FOUND, reason=IdNotFoundException.reason)
     public static class IdNotFoundException extends RuntimeException {
         public static final String reason = "ID not found";
+    }
+
+    @ResponseStatus(value=HttpStatus.UNAUTHORIZED, reason=VoteNotAuthorizedException.reason)
+    public static class VoteNotAuthorizedException extends RuntimeException {
+        public static final String reason = "Validation code not accepted";
     }
 
     public static class IllegalManipulationException extends ResponseStatusException {

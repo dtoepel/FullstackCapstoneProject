@@ -1,7 +1,6 @@
 package org.example.backend.service;
 
-import org.example.backend.model.db.Candidate;
-import org.example.backend.model.db.Election;
+import org.example.backend.model.db.*;
 import org.example.backend.repository.CandidateRepo;
 import org.example.backend.repository.ElectionRepo;
 import org.example.backend.repository.VoterRepo;
@@ -72,6 +71,29 @@ public class ElectionService {
                 voterRepo.saveAll(electionDB.createVoterCodes());
             }
             return updateElection(electionDB.advance());
+        } else {
+            throw new Election.IdNotFoundException();
+        }
+    }
+
+    public void vote(String electionId, VoteDTO vote) {
+        Optional<Election> electionO = getElectionById(electionId);
+        if(electionO.isPresent()) {
+            Election electionDB = electionO.get();
+            if(electionDB.electionState() != Election.ElectionState.VOTING) {
+                throw new Election.IllegalManipulationException(MSG_VOTES_CANNOT_BE_CAST);}
+            if(vote.rankingIDs().isEmpty()) {
+                throw new Election.IllegalManipulationException(MSG_NO_EMPTY_VOTES);}
+            List<Voter> allVoters = voterRepo.findAll();
+            List<Voter> validVoters = allVoters.stream().filter(voter -> {return
+                    electionDB.id().equals(voter.electionID()) &&
+                    voter.validationCode().equals(vote.validationCode());}).toList();
+            if(validVoters.isEmpty()) {
+                throw new Election.VoteNotAuthorizedException();
+            } else {
+                voterRepo.deleteById(validVoters.getFirst().id());
+                electionRepo.save(electionDB.vote(new Vote(vote.rankingIDs())));
+            }
         } else {
             throw new Election.IdNotFoundException();
         }

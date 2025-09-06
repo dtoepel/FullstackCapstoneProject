@@ -2,7 +2,6 @@ package org.example.backend.service;
 
 import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Election;
-import org.example.backend.model.db.Voter;
 import org.example.backend.repository.CandidateRepo;
 import org.example.backend.repository.ElectionRepo;
 import org.example.backend.repository.VoterRepo;

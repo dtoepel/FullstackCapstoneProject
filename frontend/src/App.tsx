@@ -32,8 +32,9 @@ function App() {
 
     // default values for forms
     const defaultElection:Election = {
-        name:"new Election",id:"ABC00",candidateIDs:[],votes:[],electionState:"OPEN",
-        description:"Enter description here...",seats:1,electionMethod:"STV",candidateType:"Person"
+        name:"new Election",id:"ABC00",description:"Enter description here...",
+        candidateIDs:[],votes:[],voterEmails:[],
+        electionState:"OPEN",seats:1,electionMethod:"STV",candidateType:"Person"
     };
     const defaultCandidate:Candidate = {
         id:"(automatically assigned)", name:"John Doe",
@@ -41,7 +42,8 @@ function App() {
         party:"Independent", color:"888", type:"Person", archived:false
     };
     const defaultVote:Vote = {
-        rankingIDs:[]
+        rankingIDs:[],
+        validationCode:"******"
     };
 
     // temporary variables for forms
@@ -85,6 +87,10 @@ function App() {
         axios.get("/api/election").then(
             (response) => {
                 setElections(response.data);
+                if(currentElection == null && elections.length > 0) {
+                    const election = elections.at(0);
+                    if(election) setCurrentElection(election);
+                }
                 axios.get("/api/election/candidates").then(
                     (response) => {
                         setCandidates(response.data);
@@ -355,6 +361,7 @@ function App() {
                 vote={newVote}
                 setVote={setNewVote}
                 onVoteSubmit={submitVote}
+                setValidationCode={code => setNewVote({...newVote, validationCode:code})}
             />}/>
             <Route path={"/archive/"} element={<ElectionTable
                     elections={elections}

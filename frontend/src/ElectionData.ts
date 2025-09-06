@@ -13,6 +13,7 @@ export type Election = {
 
 export type Vote = {
     rankingIDs:string[];
+    validationCode:string;
 }
 
 export type Candidate = {
@@ -23,13 +24,6 @@ export type Candidate = {
     color:string;
     type:string;
     archived:boolean;
-}
-
-export type ElectionResultItem = {
-    candidate:Candidate;
-    firstVotes:string;
-    elected:boolean;
-    electedAs:string;
 }
 
 export type STVResultItem = {

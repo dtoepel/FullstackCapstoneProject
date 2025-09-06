@@ -11,6 +11,7 @@ export type AddVoteFormProps = {
     vote:Vote;
     setVote:(vote:Vote)=>void;
     onVoteSubmit:()=>void;
+    setValidationCode:(code:string)=>void;
 }
 
 export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
@@ -97,11 +98,6 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
     }
     ballotNo = ballotNo.substring(0,2)+"-"+ ballotNo.substring(2,3)+"-"+ ballotNo.substring(3,5)
 
-    if(props.election == null && props.allElections.length>0) {
-        const election = props.allElections.at(0);
-        if(election) props.setElection(election);
-    }
-
     return(<>
             {getElectionSelector()}
             <div className={"ballot"} style={{maxWidth:"min(500px,95vw)"}}>
@@ -113,7 +109,7 @@ export default function AddVoteForm(props:Readonly<AddVoteFormProps>) {
                 </div>
                 <div className={"ballot-item"} style={{flexDirection:"row"}}>
                     <p style={{fontWeight:"bold",fontSize:"16px",color:"var(--mydarkblue)"}}>Validation Code:</p>
-                    <input style={{width:"33%",margin:"0 0 0 10px"}}/>
+                    <input style={{width:"33%",margin:"0 0 0 10px"}} onChange={e=>props.setValidationCode(e.target.value)} value={props.vote.validationCode}/>
                 </div>
                 <div className={"ballot-item"} style={{flexDirection:"column",backgroundColor:"var(--mydarkblue)"}}>
                     <p style={{fontWeight:"bold",fontSize:"24px",color:"#fff"}}>Ranked Candidates:</p>

@@ -100,15 +100,15 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
         if(a == null) return "";
         if(a.length==0) return "";
         let s:string = "";
-        a.map(item => {s += "," + item});
+        a.forEach(item => {s += "," + item});
         return s.substring(1);
     }
 
     function getInvalid(a:string[]):string {
         if(a == null) return "";
         let s:string = "";
-        a.map(item => {
-            if(!item.match("^(?![_.-])((?![_.-][_.-])[a-zA-Z\\d_.-]){0,63}[a-zA-Z\\d]@((?!-)((?!--)[a-zA-Z\\d-]){0,63}[a-zA-Z\\d]\\.){1,2}([a-zA-Z]{2,14}\\.)?[a-zA-Z]{2,14}$"))
+        a.forEach(item => {
+            if(!(new RegExp("^(?![_.-])((?![_.-][_.-])[a-zA-Z\\d_.-]){0,63}[a-zA-Z\\d]@((?!-)((?!--)[a-zA-Z\\d-]){0,63}[a-zA-Z\\d]\\.){1,2}([a-zA-Z]{2,14}\\.)?[a-zA-Z]{2,14}$").exec(item)))
             s += "," + item});
 
         if(s.length==0) return "";
