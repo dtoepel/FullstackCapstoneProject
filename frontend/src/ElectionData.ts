@@ -49,3 +49,9 @@ export function getAllCandidateTypes(candidates : Candidate[]):string[] {
         })
     return types;
 }
+
+export type MyError = {
+    status:number|undefined;
+    message:string;
+    message2:string|null;
+}
