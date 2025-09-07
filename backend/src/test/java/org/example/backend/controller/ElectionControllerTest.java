@@ -533,6 +533,28 @@ class ElectionControllerTest {
     }
 
     @Test
+    void voteElectionFailNotFound() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+        voterRepo.save(new Voter(null, "any@example.com", "id2", "ABCDEF"));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/vote/id3")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                        {
+                           "rankingIDs": ["A","B"],
+                           "validationCode" : "ABCDEF"
+                        }
+                    """))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.REASON));
+    }
+
+    @Test
     void voteElectionFailEmpty() throws Exception {
         //GIVEN
         electionRepo.deleteAll();
@@ -594,6 +616,53 @@ class ElectionControllerTest {
         assertTrue(voterRepo.findAll().isEmpty());
         assertEquals(1, electionRepo.findById("id2").orElseThrow().votes().size());
     }
+
+    @Test
+    void getVotes() throws Exception {
+        //GIVEN
+        voterRepo.deleteAll();
+        voterRepo.save(new Voter("vId1", "voter9@example.co.nz", "eId1", "QWERTZ"));
+        voterRepo.save(new Voter("vId2", "voter9@example.co.nz", "eId2", "ASDFGH"));
+        voterRepo.save(new Voter("vId3", "voter10@example.com.au", "eId2", "YXCVBN"));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/email/voter10@example.com.au"))
+
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(
+                """                     
+                    [
+                      {
+                        "id": "vId3",
+                        "email": "voter10@example.com.au",
+                        "electionID": "eId2",
+                        "validationCode": "YXCVBN"
+                      }
+                    ]
+                    """));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/email/voter10@example.co.nz"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json("[]"));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/email/voter9@example.co.nz"))
+
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().
+                json("""
+            [{"id":"vId1","email":"voter9@example.co.nz","electionID":
+                "eId1","validationCode":"QWERTZ"},
+             {"id":"vId2","email":
+                "voter9@example.co.nz","electionID":"eId2","validationCode":"ASDFGH"}]
+            """));
+    }
+
     @Test
     void failGetElectionResultsEmpty() throws Exception {
         //GIVEN
@@ -673,8 +742,8 @@ class ElectionControllerTest {
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
-    @Test
 
+    @Test
     void deleteElectionFail() throws Exception {
         //GIVEN
         electionRepo.deleteAll();
