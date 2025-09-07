@@ -26,6 +26,13 @@ export type Candidate = {
     archived:boolean;
 }
 
+export type Voter = {
+    id:string;
+    email:string;
+    electionID:string;
+    validationCode:string;
+}
+
 export type STVResultItem = {
     candidateID:string;
     votes:string[];
