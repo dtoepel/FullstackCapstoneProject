@@ -63,6 +63,19 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
         }
     }
 
+    function getVotes(election:Election):string {
+        const totalVoters = election.voterEmails==null?0:election.voterEmails.length;
+        const votesCast = election.votes.length;
+
+        if(election.electionState == "OPEN") {
+            return totalVoters + " Voters";
+        } else if(election.electionState == "VOTING") {
+            return votesCast + "/" + totalVoters + " Votes in";
+        } else {
+            return votesCast + "/" + totalVoters + " Turnout";
+        }
+    }
+
     return(
         <>
             <div style={{display:"flex", flexDirection:"row"}}>
@@ -77,6 +90,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                     <th>Info</th>
                     <th>Candidates</th>
                     <th>Seats</th>
+                    <th>Votes</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -96,10 +110,11 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
                             <td>{election.description}</td>
                             <td><div style={{display:"flex", flexDirection:"row", flexWrap:"wrap"}}>
                                 {candidates.map(candidate => {return(
-                                    <CandidateBox candidate={candidate}/>
+                                    <CandidateBox candidate={candidate} key={candidate.id}/>
                                 )})}
                             </div></td>
                             <td>{election.seats}</td>
+                            <td>{getVotes(election)}</td>
                             <td>{getButtons(election)}</td>
                         </tr>
                     )})}
