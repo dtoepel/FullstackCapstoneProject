@@ -33,7 +33,9 @@ function App() {
     // default values for forms
     const defaultElection:Election = {
         name:"new Election",id:"ABC00",description:"Enter description here...",
-        candidateIDs:[],votes:[],voterEmails:[],
+        candidateIDs:[],votes:[],voterEmails:["voter1@example.com",
+            "voter2@example.com","voter3@example.com","voter4@example.com",
+            "voter5@example.com","voter6@example.com","voter7@example.com"],
         electionState:"OPEN",seats:1,electionMethod:"STV",candidateType:"Person"
     };
     const defaultCandidate:Candidate = {
@@ -77,6 +79,7 @@ function App() {
     const [newVote, setNewVote] = useState<Vote>(defaultVote)
     const [result, setResult] = useState<STVResultItem[]>([])
 
+    const [confirmDeleteElection, setConfirmDeleteElection] = useState<Election|null>(null)
     const [confirmDeleteCandidate, setConfirmDeleteCandidate] = useState<Candidate|null>(null)
     const [confirmRetireCandidate, setConfirmRetireCandidate] = useState<Candidate|null>(null)
     const [error, setError] = useState<MyError>({status:200, message:"test", message2:null})
@@ -297,7 +300,7 @@ function App() {
                     nav("/editElection/")
                 }}
                 onAdvanceElection={advanceElection}
-                onDeleteElection={deleteElection}
+                onDeleteElection={setConfirmDeleteElection}
             />}/>
             <Route path={"/createElection/"} element={<ElectionForm
                 election={editElectionProps.election}
@@ -372,7 +375,7 @@ function App() {
                     onEditElection={() => {}}
                     onAdvanceElection={() => {}}
                     onVote={() => {}}
-                    onDeleteElection={deleteElection}
+                    onDeleteElection={setConfirmDeleteElection}
             />}/>
             <Route path={"/result/"} element={<ResultTable
             result={result}
@@ -380,6 +383,17 @@ function App() {
             <Route path={"/error/"} element={
                 <ErrorMessage error={error}/>}/>
         </Routes>
+
+        {confirmDeleteElection != null && (
+            <ModalConfirmation title={"Confirm Delete "+confirmDeleteElection.name}
+                               onClose={() => setConfirmDeleteElection(null)}
+                               onConfirm={() => {deleteElection(confirmDeleteElection);
+                                   setConfirmDeleteElection(null)}}>
+                <p>
+                    The election {confirmDeleteElection.name} will be deleted permanently.
+                </p>
+            </ModalConfirmation>
+        )}
 
         {confirmDeleteCandidate != null && (
             <ModalConfirmation title={"Confirm Delete "+confirmDeleteCandidate.name}
