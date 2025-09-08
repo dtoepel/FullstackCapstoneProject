@@ -16,7 +16,7 @@ public record Candidate(
         this(id, init.name(), init.party(), init.color(), init.description(), init.type(), false);
     }
 
-    @ResponseStatus(value= HttpStatus.NOT_FOUND, reason= Election.IdNotFoundException.reason)
+    @ResponseStatus(value=HttpStatus.NOT_FOUND, reason=Election.IdNotFoundException.REASON)
     public static class IdNotFoundException extends RuntimeException {
         public static final String reason = "ID not found";
     }

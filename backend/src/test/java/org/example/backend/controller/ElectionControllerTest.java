@@ -2,7 +2,9 @@ package org.example.backend.controller;
 
 import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Vote;
+import org.example.backend.model.db.Voter;
 import org.example.backend.repository.CandidateRepo;
+import org.example.backend.repository.VoterRepo;
 import org.junit.jupiter.api.Test;
 import org.example.backend.model.db.Election;
 import org.example.backend.repository.ElectionRepo;
@@ -18,6 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class ElectionControllerTest {
@@ -29,11 +34,14 @@ class ElectionControllerTest {
     private ElectionRepo electionRepo;
     @Autowired
     private CandidateRepo candidateRepo;
+    @Autowired
+    private VoterRepo voterRepo;
 
     final Election OPEN_ELECTION = new Election(
             "id1",
             "MyElection",
             "some details",
+            new ArrayList<>(),
             new ArrayList<>(),
             new ArrayList<>(),
             Election.ElectionState.OPEN,
@@ -47,6 +55,7 @@ class ElectionControllerTest {
             "some details",
             Arrays.asList("candidate1", "candidate2"),
             new ArrayList<>(),
+            Arrays.asList("voter1@example.com", "voter2@example.com"),
             Election.ElectionState.VOTING,
             Election.ElectionType.STV,
             "Person",
@@ -79,7 +88,6 @@ class ElectionControllerTest {
                             ]
                             """));
     }
-
 
     @Test
     void createElectionSuccess() throws Exception {
@@ -141,9 +149,8 @@ class ElectionControllerTest {
                                 """))
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
-                .andExpect(MockMvcResultMatchers.status().reason(Election.DuplicateIdException.reason));
+                .andExpect(MockMvcResultMatchers.status().reason(Election.DuplicateIdException.REASON));
     }
-
 
     @Test
     void updateElectionSuccess() throws Exception {
@@ -209,7 +216,7 @@ class ElectionControllerTest {
                                 """))
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.reason));
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.REASON));
     }
 
     @Test
@@ -369,9 +376,73 @@ class ElectionControllerTest {
                                     "seats": 1
                                 }
                                 """))
-        //THEN
+                //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_STATUS));
+    }
+
+    @Test
+    void updateElectionFailVoters() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "MyElection",
+                                    "description": "some details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "voterEmails": ["voter3@example.com"],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_CHANGE_VOTERS));
+    }
+
+    @Test
+    void advanceOpenElectionSuccess() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        voterRepo.deleteAll();
+        electionRepo.save(new Election(
+                OPEN_ELECTION.id(), OPEN_ELECTION.name(), OPEN_ELECTION.description(),
+                Arrays.asList("cId1", "cId2", "cId3"), OPEN_ELECTION.votes(),
+                Arrays.asList("voter1@example.com", "voter2@example.com"),
+                OPEN_ELECTION.electionState(), OPEN_ELECTION.electionMethod(),
+                OPEN_ELECTION.candidateType(), 2));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id1"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isAccepted());
+
+        assertEquals(2, voterRepo.findAll().size());
+        assertEquals(Election.ElectionState.VOTING, electionRepo.findById("id1").orElseThrow().electionState());
+    }
+
+    @Test
+    void advanceElectionFailNotFound() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(OPEN_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.REASON));
     }
 
     @Test
@@ -380,8 +451,9 @@ class ElectionControllerTest {
         electionRepo.deleteAll();
         electionRepo.save(OPEN_ELECTION);
 
-        //WHE
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id1"))
+
         //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_TOO_FEW_CANDIDATES));
@@ -393,9 +465,10 @@ class ElectionControllerTest {
         electionRepo.deleteAll();
         electionRepo.save(VOTING_ELECTION);
 
-        //WHE
+        //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election/advance/id2"))
-                //THEN
+
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_TOO_FEW_VOTES));
     }
@@ -450,7 +523,8 @@ class ElectionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {
-                               "rankingIDs": ["A","B"]
+                               "rankingIDs": ["A","B"],
+                               "validationCode" : "IRRELEVANT"
                             }
                         """))
                 //THEN
@@ -469,14 +543,57 @@ class ElectionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                             {
-                               "rankingIDs": []
+                               "rankingIDs": [],
+                               "validationCode" : "IRRELEVANT"
                             }
                         """))
-                //THEN
+        //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_NO_EMPTY_VOTES));
     }
 
+    @Test
+    void voteElectionFailUnauthorized() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/vote/id2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {
+                               "rankingIDs": ["A","B"],
+                               "validationCode" : "IRRELEVANT"
+                            }
+                        """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.VoteNotAuthorizedException.REASON));
+    }
+
+    @Test
+    void voteElectionSuccess() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+        voterRepo.save(new Voter(null, "any@example.com", "id2", "ABCDEF"));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/vote/id2")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {
+                               "rankingIDs": ["A","B"],
+                               "validationCode" : "ABCDEF"
+                            }
+                        """))
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
+        assertTrue(voterRepo.findAll().isEmpty());
+        assertEquals(1, electionRepo.findById("id2").orElseThrow().votes().size());
+    }
     @Test
     void failGetElectionResultsEmpty() throws Exception {
         //GIVEN
@@ -485,6 +602,7 @@ class ElectionControllerTest {
                 "any",
                 "any",
                 Arrays.asList("A", "B"),
+                new ArrayList<>(),
                 new ArrayList<>(),
                 Election.ElectionState.CLOSED,
                 Election.ElectionType.STV,
@@ -509,6 +627,7 @@ class ElectionControllerTest {
                 "any",
                 Arrays.asList("A", "B"),
                 List.of(new Vote(List.of("A"))),
+                new ArrayList<>(),
                 Election.ElectionState.CLOSED,
                 Election.ElectionType.STV,
                 "any",
@@ -538,7 +657,7 @@ class ElectionControllerTest {
 
         //THEN
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.reason));
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IdNotFoundException.REASON));
 
     }
 
