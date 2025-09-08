@@ -96,4 +96,8 @@ public class ElectionService {
             throw new Election.IdNotFoundException();
         }
     }
+
+    public List<Voter> getCodes(String email) {
+        return voterRepo.findAll().stream().filter(voter -> voter.email().equals(email)).toList();
+    }
 }

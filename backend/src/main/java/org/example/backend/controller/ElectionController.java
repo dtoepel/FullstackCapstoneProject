@@ -154,4 +154,9 @@ public class ElectionController {
         if(!electionService.deleteCandidate(candidateID))
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Object does not exist");
     }
+
+    @GetMapping("/email/{email}")
+    public List<Voter> getCodes(@PathVariable String email) {
+        return electionService.getCodes(email);
+    }
 }

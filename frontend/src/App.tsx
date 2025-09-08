@@ -6,8 +6,9 @@ import archiveLogo from './assets/archive-inv.svg'
 import logoutLogo from './assets/logout.svg'
 import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
+import mailLogo from './assets/email.svg'
 
-import type {Candidate, Election, MyError, STVResultItem, Vote} from "./ElectionData.ts";
+import type {Candidate, Election, MyError, STVResultItem, Vote, Voter} from "./ElectionData.ts";
 
 import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
@@ -22,6 +23,7 @@ import AddVoteForm from "./AddVoteForm.tsx";
 import ResultTable from "./ResultTable.tsx";
 import ModalConfirmation from "./ModalConfirmation.tsx";
 import ErrorMessage from "./ErrorMessage.tsx";
+import VoterEMailForm from "./VoterEMailForm.tsx";
 
 function App() {
     const nav = useNavigate();
@@ -29,6 +31,7 @@ function App() {
     // main model
     const [elections, setElections] = useState<Election[]>([]);
     const [candidates, setCandidates] = useState<Candidate[]>([]);
+    const [voterCodes, setVoterCodes] = useState<Voter[]>([])
 
     // default values for forms
     const defaultElection:Election = {
@@ -176,6 +179,13 @@ function App() {
             .catch(error => { handleError(error) })
     }
 
+    function getVoterCodes(email:string):void {
+        if(email) axios.get("/api/election/email/" + email)
+            .then(response => {
+                setVoterCodes(response.data);})
+            .catch(error => { handleError(error) })
+    }
+
     function handleError(error:AxiosError) {
         const status:number|undefined = error.status;
         const message:string = error.message;
@@ -263,6 +273,10 @@ function App() {
                 text={"Archive"}
                 symbolFile={archiveLogo}
                 onClick={() => nav("/archive/")}/>
+            <NavigationItem
+                text={"Get Code"}
+                symbolFile={mailLogo}
+                onClick={() => nav("/voterEmail/")}/>
             <NavigationItem
                 text={user?"Logout":"Login"}
                 symbolFile={user?logoutLogo:loginLogo}
@@ -382,6 +396,12 @@ function App() {
             allCandidates={candidates}/>}/>
             <Route path={"/error/"} element={
                 <ErrorMessage error={error}/>}/>
+            <Route path={"/voterEmail/"} element={
+               <VoterEMailForm
+                   elections={elections}
+                   onSubmit={getVoterCodes}
+                   voterList={voterCodes}/>
+            }/>
         </Routes>
 
         {confirmDeleteElection != null && (

@@ -1,7 +1,7 @@
 import type {Candidate, Election} from "./ElectionData.ts";
 import CandidateBox from "./CandidateBox.tsx";
 import {useState} from "react";
-import PageSelector from "./img/PageSelector.tsx";
+import PageSelector from "./PageSelector.tsx";
 
 export type ElectionTableProps = {
     elections:Election[];
