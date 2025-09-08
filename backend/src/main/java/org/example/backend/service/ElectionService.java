@@ -39,6 +39,7 @@ public class ElectionService {
         Optional<Election> response = electionRepo.findById(electionId);
         if(response.isPresent()) {
             electionRepo.deleteById(electionId);
+            voterRepo.deleteAll(voterRepo.findAll().stream().filter(voter -> voter.electionID().equals(electionId)).toList());
             return true;
         }
         return false;

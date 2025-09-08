@@ -77,7 +77,7 @@ public class ElectionController {
             throw new Election.IllegalManipulationException(MSG_CANNOT_CHANGE_METHOD);
         if (electionDB.seats() != (election.seats()))
             throw new Election.IllegalManipulationException(MSG_CANNOT_CHANGE_SEATS);
-        if (electionDB.voterEmails() != (election.voterEmails()))
+        if (!election.voterEmails().equals(electionDB.voterEmails()))
             throw new Election.IllegalManipulationException(MSG_CANNOT_CHANGE_VOTERS);
 
         // No checks have failed, now the remaining cases (!= OPEN) can be updated

@@ -153,7 +153,7 @@ class ElectionControllerTest {
     }
 
     @Test
-    void updateElectionSuccess() throws Exception {
+    void updateOpenElectionSuccess() throws Exception {
         //GIVEN
         electionRepo.deleteAll();
         electionRepo.save(OPEN_ELECTION);
@@ -188,6 +188,48 @@ class ElectionControllerTest {
                                     "candidateType": "Person",
                                     "electionMethod": "STV",
                                     "seats": 4
+                                }
+                                """));
+    }
+
+    @Test
+    void updateNonOpenElectionSuccess() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(VOTING_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "id2",
+                                    "name": "My Election",
+                                    "description": "some other details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "voterEmails": ["voter1@example.com", "voter2@example.com"],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isAccepted())
+                .andExpect(MockMvcResultMatchers.content().json(
+                        """ 
+                                {
+                                    "id": "id2",
+                                    "name": "My Election",
+                                    "description": "some other details",
+                                    "candidateIDs": ["candidate1", "candidate2"],
+                                    "electionState": "VOTING",
+                                    "votes": [],
+                                    "voterEmails": ["voter1@example.com", "voter2@example.com"],
+                                    "candidateType": "Person",
+                                    "electionMethod": "STV",
+                                    "seats": 1
                                 }
                                 """));
     }
@@ -735,12 +777,18 @@ class ElectionControllerTest {
         //GIVEN
         electionRepo.deleteAll();
         electionRepo.save(OPEN_ELECTION);
+        voterRepo.deleteAll();
+        voterRepo.save(new Voter("1", "1", OPEN_ELECTION.id(), "1"));
+        voterRepo.save(new Voter("2", "2", VOTING_ELECTION.id(), "2"));
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/"+OPEN_ELECTION.id()))
 
                 //THEN
                 .andExpect(MockMvcResultMatchers.status().isOk());
+
+        assertEquals(1, voterRepo.findAll().size());
+        assertEquals(VOTING_ELECTION.id(), voterRepo.findAll().getFirst().electionID());
     }
 
     @Test
