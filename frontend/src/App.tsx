@@ -261,22 +261,22 @@ function App() {
                 text={"Elections"}
                 symbolFile={electionLogo}
                 onClick={() => nav("/")}/>
-            <NavigationItem
+            {user?<NavigationItem
                 text={"Candidates"}
                 symbolFile={candidatesLogo}
-                onClick={() => nav("/candidates/")}/>
-            <NavigationItem
+                onClick={() => nav("/candidates/")}/>:""}
+            {user?"":<NavigationItem
                 text={"Vote"}
                 symbolFile={voteLogo}
-                onClick={() => nav("/vote/")}/>
+                onClick={() => nav("/vote/")}/>}
             <NavigationItem
                 text={"Archive"}
                 symbolFile={archiveLogo}
                 onClick={() => nav("/archive/")}/>
-            <NavigationItem
+            {user?"":<NavigationItem
                 text={"Get Code"}
                 symbolFile={mailLogo}
-                onClick={() => nav("/voterEmail/")}/>
+                onClick={() => nav("/voterEmail/")}/>}
             <NavigationItem
                 text={user?"Logout":"Login"}
                 symbolFile={user?logoutLogo:loginLogo}
