@@ -315,6 +315,7 @@ function App() {
                 }}
                 onAdvanceElection={advanceElection}
                 onDeleteElection={setConfirmDeleteElection}
+                isAdmin={!!user}
             />}/>
             <Route path={"/createElection/"} element={<ElectionForm
                 election={editElectionProps.election}
@@ -323,6 +324,7 @@ function App() {
                 error={editElectionProps.error}
                 onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
                 onSubmit={createElection}
+                isAdmin={!!user}
             />}/>
             <Route path={"/editElection/"} element={<ElectionForm
                 election={editElectionProps.election}
@@ -331,6 +333,7 @@ function App() {
                 error={editElectionProps.error}
                 onEdit={(election) => setEditElectionProps({...editElectionProps, election:election})}
                 onSubmit={() => updateElection(editElectionProps.election)}
+                isAdmin={!!user}
             />}/>
             <Route path={"/candidates/"} element={<CandidateTable
                 value={candidates}
@@ -390,6 +393,7 @@ function App() {
                     onAdvanceElection={() => {}}
                     onVote={() => {}}
                     onDeleteElection={setConfirmDeleteElection}
+                    isAdmin={!!user}
             />}/>
             <Route path={"/result/"} element={<ResultTable
             result={result}
