@@ -11,6 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class CandidateControllerTest {
@@ -39,31 +41,33 @@ class CandidateControllerTest {
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.get("/api/election/candidates"))
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().json(
-                    """ 
-                                [
-                                  {
-                                    "name": "John Doe",
-                                    "description": "some details",
-                                    "party": "Independent",
-                                    "color": "#444",
-                                    "type": "Person",
-                                    "archived": false
-                                  }
-                                ]
-                                """))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
 
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isOk())
+        .andExpect(MockMvcResultMatchers.content().json(
+            """ 
+                        [
+                          {
+                            "name": "John Doe",
+                            "description": "some details",
+                            "party": "Independent",
+                            "color": "#444",
+                            "type": "Person",
+                            "archived": false
+                          }
+                        ]
+                        """))
+        .andExpect(MockMvcResultMatchers.jsonPath("$[:1].id").isNotEmpty());
     }
 
     @Test
     void createCandidateSuccess() throws Exception {
         //GIVEN
+        candidateRepo.deleteAll();
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.post("/api/election/candidates")
+                        .with(user("any-authenticated-user"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -92,6 +96,28 @@ class CandidateControllerTest {
     }
 
     @Test
+    void createCandidateFail401() throws Exception {
+        //GIVEN
+        candidateRepo.deleteAll();
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/election/candidates")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "name": "John Doe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#444",
+                                    "type": "Person",
+                                    "archived": false
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
     void updateCandidateSuccess() throws Exception {
         //GIVEN
         candidateRepo.deleteAll();
@@ -99,6 +125,7 @@ class CandidateControllerTest {
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+                        .with(user("any-authenticated-user"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -111,9 +138,9 @@ class CandidateControllerTest {
                                     "archived": false
                                 }
                                 """))
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isAccepted())
-                .andExpect(MockMvcResultMatchers.content().json(
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isAccepted())
+        .andExpect(MockMvcResultMatchers.content().json(
                         """ 
                                 {
                                     "id": "1",
@@ -128,13 +155,38 @@ class CandidateControllerTest {
     }
 
     @Test
-    void updateCandidateNotFound() throws Exception {
+    void updateCandidateFail401() throws Exception {
         //GIVEN
         candidateRepo.deleteAll();
         candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "id": "1",
+                                    "name": "Don Joe",
+                                    "description": "some details",
+                                    "party": "Independent",
+                                    "color": "#555",
+                                    "type": "Person",
+                                    "archived": false
+                                }
+                                """))
+                //THEN
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
+    void updateCandidateFail404() throws Exception {
+        //GIVEN
+        candidateRepo.deleteAll();
+        candidateRepo.save(DEFAULT_CANDIDATE);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.put("/api/election/candidates")
+                        .with(user("any-authenticated-user"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -147,11 +199,10 @@ class CandidateControllerTest {
                                     "archived": false
                                 }
                                 """))
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason(Candidate.IdNotFoundException.reason));
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isNotFound())
+        .andExpect(MockMvcResultMatchers.status().reason(Candidate.IdNotFoundException.reason));
     }
-
 
     @Test
     void deleteCandidateSuccess() throws Exception {
@@ -160,22 +211,37 @@ class CandidateControllerTest {
         candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/candidates/"+ DEFAULT_CANDIDATE.id()))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/candidates/"+ DEFAULT_CANDIDATE.id())
+                        .with(user("any-authenticated-user")))
 
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isOk());
     }
-    @Test
 
-    void deleteCandidateFail() throws Exception {
+    @Test
+    void deleteCandidateFail401() throws Exception {
         //GIVEN
         candidateRepo.deleteAll();
+        candidateRepo.save(DEFAULT_CANDIDATE);
 
         //WHEN
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/candidates/"+ DEFAULT_CANDIDATE.id()))
 
-                //THEN
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    }
+
+    @Test
+    void deleteCandidateFail404() throws Exception {
+        //GIVEN
+        candidateRepo.deleteAll();
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.delete("/api/election/candidates/"+ DEFAULT_CANDIDATE.id())
+                        .with(user("any-authenticated-user")))
+
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
 }
