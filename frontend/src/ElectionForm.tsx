@@ -10,6 +10,7 @@ export type EditElectionFormProps = {
     candidates:Candidate[];
     onEdit:(election:Election)=>void;
     onSubmit:()=>void
+    isAdmin:boolean
 }
 
 export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
@@ -133,7 +134,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
         }
     }
 
-    const candidatesEditable:boolean = props.election.electionState=="OPEN";
+    const candidatesEditable:boolean = props.election.electionState=="OPEN" && props.isAdmin;
     const availableCandidates:Candidate[] = candidatesEditable?
         getAvailableCandidates(props.election, props.candidates):[];
     const runningCandidates:Candidate[] =
@@ -302,7 +303,7 @@ export default function ElectionForm(props:Readonly<EditElectionFormProps>) {
                 </tbody>
             </table>
             {props.error?<p className={"error-message"}>{props.error}</p>:""}
-            <form onSubmit={(e) => submit(e)}><button>Submit</button></form>
+            {props.isAdmin?<form onSubmit={(e) => submit(e)}><button>Submit</button></form>:""}
         </div>
     )
 }

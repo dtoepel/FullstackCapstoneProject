@@ -13,6 +13,7 @@ export type ElectionTableProps = {
     onDeleteElection:(election:Election)=>void;
     onVote:(election:Election)=>void;
     isArchive:boolean;
+    isAdmin:boolean;
 }
 
 export default function ElectionTable(props:Readonly<ElectionTableProps>) {
@@ -26,33 +27,61 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
     const electionsOnPage:Election[] = filteredElections.slice(maxItems * page, maxItems * (page+1));
 
     function getDeleteButton(election:Election) {
-        return (<button onClick={() => props.onDeleteElection(election)}>Delete</button>)
+        if(props.isAdmin) {
+            return (<button onClick={() => props.onDeleteElection(election)}>Delete</button>)
+        } else {
+            return (<button disabled>Delete</button>)
+        }
     }
 
     function getResultButton(election:Election) {
         return (<button onClick={() => props.onGetResult(election)}>Result</button>)
     }
 
+    function getEditButton(election:Election) {
+        if(props.isAdmin) {
+            return (<button onClick={() => props.onEditElection(election)}>Edit</button>)
+        } else {
+            return (<button onClick={() => props.onEditElection(election)}>Show</button>)
+        }
+    }
+
+    function getAdvanceButton(election:Election, label:string) {
+        if(props.isAdmin) {
+            return (<button onClick={() => props.onAdvanceElection(election)}>{label}</button>)
+        } else {
+            return (<button disabled>{label}</button>)
+        }
+    }
+
+    function getVoteButton(election:Election) {
+        if(!props.isAdmin) {
+            return (<button onClick={() => props.onVote(election)}>Vote</button>)
+        } else {
+            return("")
+        }
+    }
+
     function getButtons(election:Election) {
         if(election.electionState==="OPEN") {
             return(<>
-                <button onClick={() => props.onEditElection(election)}>Edit</button>
-                <button onClick={() => props.onAdvanceElection(election)}>Open Voting</button>
+                {getEditButton(election)}
+                {getAdvanceButton(election, "Open Voting")}
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="VOTING") {
             return(<>
-                <button onClick={() => props.onEditElection(election)}>Edit</button>
-                <button onClick={() => props.onAdvanceElection(election)}>Close Voting</button>
-                <button onClick={() => props.onVote(election)}>Vote</button>
+                {getEditButton(election)}
+                {getAdvanceButton(election, "Close Voting")}
+                {getVoteButton(election)}
                 <button onClick={() => props.onGetResult(election)}>(Peek)</button>
                 {getDeleteButton(election)}
             </>)
         } else if(election.electionState==="CLOSED") {
             return(<>
                 {getResultButton(election)}
-                <button onClick={() => props.onAdvanceElection(election)}>Archive</button>
+                {getAdvanceButton(election, "Archive")}
                 {getDeleteButton(election)}
             </>)
         } else { // ARCHIVED
@@ -79,7 +108,7 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
     return(
         <>
             <div style={{display:"flex", flexDirection:"row"}}>
-                {props.isArchive?"":<button onClick={() => props.onCreateElection()}>Create</button>}
+                {(props.isArchive||!props.isAdmin)?"":<button onClick={() => props.onCreateElection()}>Create</button>}
                 <PageSelector page={page} setPage={setPage} maxPages={maxPages}/>
             </div>
             <table border={1}>
