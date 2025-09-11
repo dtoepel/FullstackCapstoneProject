@@ -43,10 +43,10 @@ export default function PageSelector(props:Readonly<PageSelectorProps>) {
     }
 
     return(
-        <>
+        <div style={{display:"flex", flexDirection:"row", alignItems:"baseline", justifyContent:"center"}}>
             {getPreviousButton()}
             {getPageSelector()}
             {getNextButton()}
-        </>
+        </div>
     )
 }
