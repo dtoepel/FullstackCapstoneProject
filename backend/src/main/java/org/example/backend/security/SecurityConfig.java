@@ -33,6 +33,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/election/candidates").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/election/email/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/election/results/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/election/result-analysis/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/election/result-condorcet/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/election/vote/**").permitAll()
                 .anyRequest().authenticated()
             )

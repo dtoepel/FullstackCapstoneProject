@@ -1,7 +1,6 @@
 package org.example.backend.controller;
 
-import org.example.backend.model.count.CountService;
-import org.example.backend.model.count.DetailedResult;
+import org.example.backend.model.count.*;
 import org.example.backend.model.db.*;
 import org.example.backend.service.ElectionService;
 import org.springframework.http.HttpStatus;
@@ -111,6 +110,37 @@ public class ElectionController {
             List<DetailedResult.ResultItem> result = CountService.getElectionResult(electionO.get(), allCandidates);
             return new ResponseEntity<>(
                     result,
+                    HttpStatus.OK);
+        } else {
+            throw new Election.IdNotFoundException();
+        }
+    }
+
+    @GetMapping("/result-condorcet/{electionId}")
+    public ResponseEntity<CondorcetAlgorithm.CondorcetResult> getCondorcetResults(@PathVariable("electionId") String electionId) {
+        Optional<Election> electionO = electionService.getElectionById(electionId);
+        List<Candidate> allCandidates = electionService.getAllCandidates();
+        if(electionO.isPresent()) {
+            if (electionO.get().votes().isEmpty())
+                throw new Election.IllegalManipulationException(MSG_CANNOT_COUNT_EMPTY_VOTES);
+            List<DetailedResult.ResultItem> result = CountService.getElectionResult(electionO.get(), allCandidates);
+            return new ResponseEntity<>(
+                    CondorcetAlgorithm.performCondorcetAlgorithm(electionO.get().candidateIDs(), electionO.get().votes()),
+                    HttpStatus.OK);
+        } else {
+            throw new Election.IdNotFoundException();
+        }
+    }
+
+    @GetMapping("/result-analysis/{electionId}")
+    public ResponseEntity<AnalysisResult> getElectionResultAnalysis(@PathVariable("electionId") String electionId) {
+        Optional<Election> electionO = electionService.getElectionById(electionId);
+        List<Candidate> allCandidates = electionService.getAllCandidates();
+        if(electionO.isPresent()) {
+            if (electionO.get().votes().isEmpty())
+                throw new Election.IllegalManipulationException(MSG_CANNOT_COUNT_EMPTY_VOTES);
+            return new ResponseEntity<>(
+                    Analysis.analyseDistributionAnomalies(electionO.get(), allCandidates),
                     HttpStatus.OK);
         } else {
             throw new Election.IdNotFoundException();

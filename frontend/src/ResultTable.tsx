@@ -1,7 +1,11 @@
-import type {Candidate, STVResultItem} from "./ElectionData.ts";
+import type {AnalysisResult, Candidate, CondorcetResult, STVResultItem} from "./ElectionData.ts";
+import CandidateBox from "./CandidateBox.tsx";
+import type {JSX} from "react";
 
 export type ResultTableProps = {
     result:STVResultItem[];
+    resultAnalysis:AnalysisResult;
+    resultCondorcet:CondorcetResult;
     allCandidates:Candidate[];
 }
 
@@ -19,8 +23,36 @@ export default function ResultTable(props:Readonly<ResultTableProps>) {
     const firstLineU:STVResultItem|undefined = props.result.at(0);
     const firstLine:STVResultItem = firstLineU ?? {candidateID:"",votes:[]};
 
+    console.log(props.resultAnalysis)
+
+    function getCandidateBox(id: string | undefined):JSX.Element {
+        const candidate:Candidate|undefined = props.allCandidates.filter(c => c.id == id).at(0);
+        if(candidate != undefined) {
+            return (<CandidateBox candidate={candidate}/>);
+        } else {
+            return (<p className={"errorMessage"}>candidate undefined</p>)
+        }
+    }
+
+    function getComparisonRow(lowerU: string[] | undefined, upper: string[], lowerCount: number):JSX.Element {
+        const lower:string[] = lowerU?lowerU:[];
+        const gain:string[] = upper.filter(id => lower.indexOf(id)<0);
+        const lose:string[] = lower.filter(id => upper.indexOf(id)<0);
+
+        if(lose.length == 0)
+            // no paradox
+            return (<tr><td>From {lowerCount} to {lowerCount+1} seats, candidate {getCandidateBox(gain.at(0))}
+                would be elected</td></tr>);
+        else
+            return (<tr><td>From {lowerCount} to {lowerCount+1} seats,
+                a <b>paradoxon</b> would occur: <br/>
+                While candidates {gain.map(c => getCandidateBox(c))} would have been elected,
+                {lose.length==1?" candidate":" candidates"} {lose.map(c => getCandidateBox(c))}
+                would <b>not</b> have been elected.</td></tr>);
+    }
+
     return(
-        <div style={{overflow:"scroll", height:"400px", width:"95vw"}}>
+    <div style={{overflow:"scroll", height:"400px", width:"95vw"}}>
         <table border={1}>
             <thead>
                 <tr>
@@ -50,6 +82,46 @@ export default function ResultTable(props:Readonly<ResultTableProps>) {
               )})}
             </tbody>
         </table>
-        </div>
+        <hr/>
+        <table border={1}>
+            {props.resultAnalysis.electedIdsBySeats.map((result, index, array) => {
+                if(index == 0)
+                    return (getComparisonRow([], result, index))
+                else
+                    return (getComparisonRow(array.at(index-1), result, index))}
+            )}
+        </table>
+        <hr/>
+        <table border={1}>
+            <thead>
+                <tr><th>&nbsp;</th>
+                    {props.resultCondorcet.candidateIDs.map((candidateID, indexY) => {
+                        const candidateU:Candidate|undefined = props.allCandidates
+                            .filter(c => c.id === candidateID)
+                            .at(0);
+                        return(<th style={{backgroundColor:candidateU?("#"+candidateU.color):"#fff"}}>{indexY+1}</th>)
+                    })}
+                </tr>
+            </thead>
+            {props.resultCondorcet.candidateIDs.map((candidateID, indexY) => {
+                const myDuels = props.resultCondorcet.duels[indexY];
+                return(<tr><td><div style={{display:"flex",flexDirection:"row"}}><span>{(indexY+1) + ": "}</span>{getCandidateBox(candidateID)}</div></td>
+
+                    {myDuels.map((num, indexX) => {
+                        if (indexX == indexY) {
+                            return (<td style={{backgroundColor: "#000"}}>&nbsp;</td>)
+                        } else if (num > 0) {
+                            return (<td style={{backgroundColor: "var(--mylightgreen)"}}>{num}</td>)
+                        } else if (num < 0) {
+                            return (<td style={{backgroundColor: "var(--mylightred)"}}>{num}</td>)
+                        } else {
+                            return (<td>{num}</td>)
+                        }
+                    })}
+
+                </tr>
+            )})}
+        </table>
+    </div>
     )
 }
