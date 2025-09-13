@@ -78,5 +78,53 @@ class MeekAlgorithmTest {
         }
     }
 
+    @Test
+    void analyseElectionTest() {
+        //GIVEN
+        ArrayList<Vote> votes = new ArrayList<>();
+        for(int i = 0; i < 6; i++) votes.add(new Vote(Arrays.asList("A", "D")));
+        for(int i = 0; i < 5; i++) votes.add(new Vote(Arrays.asList("B", "E")));
+        for(int i = 0; i < 2; i++) votes.add(new Vote(Arrays.asList("C", "B")));
+        for(int i = 0; i < 2; i++) votes.add(new Vote(Arrays.asList("C", "D")));
+        Election election = new Election(
+                "any", "any", "any",
+                Arrays.asList("A", "B", "C", "D", "E"),
+                votes,
+                new ArrayList<>(),
+                Election.ElectionState.CLOSED,
+                Election.ElectionType.STV,
+                "any",
+                2);
+
+        //WHEN
+        AnalysisResult result = Analysis.analyseDistributionAnomalies(election, getDefaultCandidates());
+
+        //THEN
+        assertEquals(election.seats()+2, result.electedIdsBySeats().size());
+        for(int i = 0; i < election.seats()+2; i++) {
+            assertEquals(i+1, result.electedIdsBySeats().get(i).size());
+        }
+    }
+
+    @Test
+    void analyseElectionTestFail() {
+        //GIVEN
+        ArrayList<Vote> votes = new ArrayList<>();
+        for(int i = 0; i < 6; i++) votes.add(new Vote(List.of("A")));
+        for(int i = 0; i < 5; i++) votes.add(new Vote(List.of("B")));
+        Election election = new Election(
+                "any", "any", "any",
+                Arrays.asList("A", "B"),
+                votes,
+                new ArrayList<>(),
+                Election.ElectionState.CLOSED,
+                Election.ElectionType.STV,
+                "any",
+                1);
+
+        //WHEN/THEN
+        assertThrows(Analysis.CannotAnalyseElectionException.class,
+                () -> Analysis.analyseDistributionAnomalies(election, getDefaultCandidates()));
+    }
 
 }

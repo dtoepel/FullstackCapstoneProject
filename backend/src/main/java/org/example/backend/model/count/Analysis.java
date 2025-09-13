@@ -24,7 +24,7 @@ public class Analysis {
         ArrayList<List<String>> electedBySeats = new ArrayList<>();
         int minSeats = 1;
         int maxSeats = Math.min(election.seats() + 2, election.candidateIDs().size()-1);
-        if(minSeats >= maxSeats) {throw new RuntimeException("Analysis pointless: Only " +
+        if(minSeats >= maxSeats) {throw new CannotAnalyseElectionException("Analysis pointless: Only " +
                 election.candidateIDs().size() + " candidates available." );}
 
         for(int i = minSeats; i <= maxSeats; i++) {
@@ -39,5 +39,11 @@ public class Analysis {
          */
 
         return new AnalysisResult(electedBySeats);
+    }
+
+    public static class CannotAnalyseElectionException extends RuntimeException {
+        public CannotAnalyseElectionException(String message) {
+            super(message);
+        }
     }
 }
