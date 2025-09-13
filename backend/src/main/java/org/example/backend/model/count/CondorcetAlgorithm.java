@@ -1,10 +1,12 @@
 package org.example.backend.model.count;
 
+import org.example.backend.model.db.Vote;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CondorcetAlgorithm {
-
+    private CondorcetAlgorithm() {}
 
     public static CondorcetResult performCondorcetAlgorithm(List<String> candidates_Arg,
                          List<org.example.backend.model.db.Vote> votes_Args) {
@@ -31,33 +33,7 @@ public class CondorcetAlgorithm {
             }
         }
 
-        /*
-           the diagonal is pointless as is it compares candidates with themselves,
-           also the matrix is negated and mirrored at the diagonal, therefore only the upper right half is counted
-           and immediately copied to the bottom left for convenience
-         */
-
-        for(int i = 0; i < candidates.size(); i++) {
-            for(int j = i+1; j < candidates.size(); j++) { // only upper right
-                String c1 =  candidates.get(i);
-                String c2 =  candidates.get(j);
-                for(org.example.backend.model.db.Vote v : votes) {
-                    int index1 = v.rankingIDs().indexOf(c1);
-                    int index2 = v.rankingIDs().indexOf(c2);
-
-                    if(index1 == index2)  //both unranked -> draw
-                        {} // do nothing
-                    else if(index1 == -1)
-                        {duels[i][j]--; duels[j][i]++;} // 2 ranked, 1 unranked, 2 wins
-                    else if(index2 == -1)
-                        {duels[i][j]++; duels[j][i]--;} // 1 ranked, 2 unranked, 1 wins
-                    else if(index1 < index2)
-                        {duels[i][j]++; duels[j][i]--;} // 1 wins
-                    else
-                        {duels[i][j]--; duels[j][i]++;} // 2 wins
-                }
-            }
-        }
+        countDuels(duels, candidates, votes);
 
         /* now the candidates have been paired and compared.
            the candidates are now ranked, how often they won each duel.
@@ -102,6 +78,44 @@ public class CondorcetAlgorithm {
         } else {
             return performCondorcetAlgorithm(candidatesSorted, votes);
         }
+    }
+
+    private static void countDuels(int[][] duels, ArrayList<String> candidates, ArrayList<Vote> votes) {
+        /*
+           the diagonal is pointless as is it compares candidates with themselves,
+           also the matrix is negated and mirrored at the diagonal, therefore only the upper right half is counted
+           and immediately copied to the bottom left for convenience
+         */
+
+        for(int i = 0; i < candidates.size(); i++) {
+            for(int j = i+1; j < candidates.size(); j++) { // only upper right
+                String c1 =  candidates.get(i);
+                String c2 =  candidates.get(j);
+                for(org.example.backend.model.db.Vote v : votes) {
+                    int index1 = v.rankingIDs().indexOf(c1);
+                    int index2 = v.rankingIDs().indexOf(c2);
+
+                    if(index1 != index2) evalDuel(duels, i, j, index1, index2);
+                }
+            }
+        }
+    }
+
+    private static void evalDuel(int[][] duels, int i, int j, int index1, int index2) {
+        // the case that both are unranked has already been covered. Else:
+        if(index1 == -1)
+            inc(duels, j, i); // 2 ranked, 1 unranked, 2 wins
+        else if(index2 == -1)
+            inc(duels, i, j); // 1 ranked, 2 unranked, 1 wins
+        else if(index1 < index2)
+            inc(duels, i, j); // 1 wins
+        else
+            inc(duels, j, i); // 2 wins
+    }
+
+    private static void inc(int[][] duels, int i, int j) {
+        duels[i][j]--;
+        duels[j][i]++;
     }
 
     public record CondorcetResult(

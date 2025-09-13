@@ -119,7 +119,6 @@ public class ElectionController {
     @GetMapping("/result-condorcet/{electionId}")
     public ResponseEntity<CondorcetAlgorithm.CondorcetResult> getCondorcetResults(@PathVariable("electionId") String electionId) {
         Optional<Election> electionO = electionService.getElectionById(electionId);
-        List<Candidate> allCandidates = electionService.getAllCandidates();
         if(electionO.isPresent()) {
             if (electionO.get().votes().isEmpty())
                 throw new Election.IllegalManipulationException(MSG_CANNOT_COUNT_EMPTY_VOTES);

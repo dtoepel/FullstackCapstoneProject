@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Analysis {
+    private Analysis() {}
 
     public static AnalysisResult analyseDistributionAnomalies(Election election, List<Candidate> allCandidates) {
         /* the election is analysed for possible paradoxa, regarding the number of seats.
@@ -48,12 +49,9 @@ public class Analysis {
 
             if(upperCandidates.containsAll(lowerCandidates)) {
                 upperCandidates.removeAll(lowerCandidates);
-                System.out.println("From " + (i+1) + " to " + (i+2) + " new: " + upperCandidates);
             } else {
                 ArrayList<String> plus = new ArrayList<>(upperCandidates); plus.removeAll(lowerCandidates);
                 ArrayList<String> minus = new ArrayList<>(lowerCandidates); plus.removeAll(upperCandidates);
-
-                System.out.println("From " + (i+1) + " to " + (i+2) + " PARADOXON: " + minus + " --> " + plus);
             }
         }
 
