@@ -123,7 +123,6 @@ public class ElectionController {
         if(electionO.isPresent()) {
             if (electionO.get().votes().isEmpty())
                 throw new Election.IllegalManipulationException(MSG_CANNOT_COUNT_EMPTY_VOTES);
-            List<DetailedResult.ResultItem> result = CountService.getElectionResult(electionO.get(), allCandidates);
             return new ResponseEntity<>(
                     CondorcetAlgorithm.performCondorcetAlgorithm(electionO.get().candidateIDs(), electionO.get().votes()),
                     HttpStatus.OK);

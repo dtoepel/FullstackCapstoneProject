@@ -15,7 +15,6 @@ public class CountService {
         ArrayList<Candidate> runningCandidates = election.getCandidates(allCandidates);
         MeekAlgorithm meek = new MeekAlgorithm(runningCandidates, election.votes(), election.seats());
         DetailedResult result = meek.perform();
-        Analysis.analyseDistributionAnomalies(election, allCandidates);
         return result.get();
     }
 }

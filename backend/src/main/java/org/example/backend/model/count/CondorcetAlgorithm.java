@@ -65,7 +65,7 @@ public class CondorcetAlgorithm {
            Each candidate draws against themself, so that cancels out automatically.
          */
 
-        int points[] = new int[candidates.size()];
+        int[] points = new int[candidates.size()];
         for(int i = 0; i < candidates.size(); i++) {
             points[i] = 0;
             for(int j = 0; j < candidates.size(); j++) {
