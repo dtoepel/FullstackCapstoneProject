@@ -38,6 +38,15 @@ export type STVResultItem = {
     votes:string[];
 }
 
+export type CondorcetResult = {
+    candidateIDs:string[];
+    duels:number[][];
+}
+
+export type AnalysisResult = {
+    electedIdsBySeats:string[][];
+}
+
 export function getAllCandidateTypes(candidates : Candidate[]):string[] {
     const types:string[] = [];
 
