@@ -58,9 +58,8 @@ public class CondorcetAlgorithm {
             int index2 = candidates.indexOf(o2);
             Integer points1 = points[index1];
             Integer points2 = points[index2];
-            return points1.compareTo(points2);
+            return -points1.compareTo(points2);
         });
-        Collections.reverse(candidatesSorted);
 
         /*
         Now the list of candidates has been sorted, with the candidates with the most points first,
@@ -116,8 +115,8 @@ public class CondorcetAlgorithm {
     }
 
     private static void inc(int[][] duels, int a, int b) {
-        duels[a][b]--;
-        duels[b][a]++;
+        duels[a][b]++;
+        duels[b][a]--;
     }
 
     public record CondorcetResult(
