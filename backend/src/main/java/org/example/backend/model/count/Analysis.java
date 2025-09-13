@@ -21,7 +21,6 @@ public class Analysis {
             if the number of candidates is sufficient, i.e. at least one more than seats.
          */
 
-        ArrayList<DetailedResult> results = new ArrayList<>();
         ArrayList<List<String>> electedBySeats = new ArrayList<>();
         int minSeats = 1;
         int maxSeats = Math.min(election.seats() + 2, election.candidateIDs().size()-1);
@@ -32,7 +31,6 @@ public class Analysis {
             List<Candidate> runningCandidates = election.getCandidates(allCandidates);
             MeekAlgorithm meek = new MeekAlgorithm(runningCandidates, election.votes(), i);
             DetailedResult result = meek.perform();
-            results.add(result);
             electedBySeats.add(result.getElected());
         }
 

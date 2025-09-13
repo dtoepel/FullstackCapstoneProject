@@ -3,7 +3,6 @@ package org.example.backend.model.count;
 import org.example.backend.model.db.Candidate;
 import org.example.backend.model.db.Election;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CountService {
