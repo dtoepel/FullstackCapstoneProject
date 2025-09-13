@@ -123,25 +123,5 @@ public class CondorcetAlgorithm {
     public record CondorcetResult(
             List<String> candidateIDs,
             int[][] duels
-    ) {
-        @Override
-        public String toString() {
-            return "CondorcetResult{" +
-                    "candidateIDs=" + candidateIDs +
-                    ", duels=" + Arrays.toString(duels) +
-                    '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
-            CondorcetResult that = (CondorcetResult) o;
-            return Objects.deepEquals(duels, that.duels) && Objects.equals(candidateIDs, that.candidateIDs);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(candidateIDs, Arrays.deepHashCode(duels));
-        }
-    }
+    ) {}
 }
