@@ -12,7 +12,7 @@ public class CountService {
     public static List<DetailedResult.ResultItem> getElectionResult(
             Election election,
             List<Candidate> allCandidates) {
-        ArrayList<Candidate> runningCandidates = election.getCandidates(allCandidates);
+        List<Candidate> runningCandidates = election.getCandidates(allCandidates);
         MeekAlgorithm meek = new MeekAlgorithm(runningCandidates, election.votes(), election.seats());
         DetailedResult result = meek.perform();
         return result.get();

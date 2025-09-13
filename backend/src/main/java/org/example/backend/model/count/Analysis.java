@@ -29,7 +29,7 @@ public class Analysis {
                 election.candidateIDs().size() + " candidates available." );}
 
         for(int i = minSeats; i <= maxSeats; i++) {
-            ArrayList<Candidate> runningCandidates = election.getCandidates(allCandidates);
+            List<Candidate> runningCandidates = election.getCandidates(allCandidates);
             MeekAlgorithm meek = new MeekAlgorithm(runningCandidates, election.votes(), i);
             DetailedResult result = meek.perform();
             results.add(result);
@@ -39,21 +39,6 @@ public class Analysis {
         /*
         The simulated results are in a list now, with the index + 1 being the number of candidates elected
          */
-
-        for(int i = 0; i < maxSeats-1; i++) {
-            DetailedResult lowerResult = results.get(i);
-            DetailedResult upperResult = results.get(i+1);
-
-            ArrayList<String> lowerCandidates = new ArrayList<>(lowerResult.getElected());
-            ArrayList<String> upperCandidates = new ArrayList<>(upperResult.getElected());
-
-            if(upperCandidates.containsAll(lowerCandidates)) {
-                upperCandidates.removeAll(lowerCandidates);
-            } else {
-                ArrayList<String> plus = new ArrayList<>(upperCandidates); plus.removeAll(lowerCandidates);
-                ArrayList<String> minus = new ArrayList<>(lowerCandidates); plus.removeAll(upperCandidates);
-            }
-        }
 
         return new AnalysisResult(electedBySeats);
     }

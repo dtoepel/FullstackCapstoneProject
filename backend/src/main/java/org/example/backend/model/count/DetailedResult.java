@@ -38,7 +38,7 @@ public class DetailedResult {
     void recordElectedCandidate(Candidate candidate) {electedCandidateIDs.add(candidate.getDbCandidate().id());}
     void recordExcludedCandidate(Candidate candidate) {excludedCandidateIDs.add(candidate.getDbCandidate().id());}
 
-    public ArrayList<String> getElected() {return electedCandidateIDs;}
+    public List<String> getElected() {return electedCandidateIDs;}
 
     public record ResultItem(String candidateID, List<String> votes) {}
 

@@ -3,13 +3,14 @@ package org.example.backend.model.count;
 import org.example.backend.model.db.Vote;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class CondorcetAlgorithm {
     private CondorcetAlgorithm() {}
 
-    public static CondorcetResult performCondorcetAlgorithm(List<String> candidates_Arg,
-                         List<org.example.backend.model.db.Vote> votes_Args) {
+    public static CondorcetResult performCondorcetAlgorithm(List<String> candidatesArg,
+                         List<org.example.backend.model.db.Vote> votesArgs) {
 
         /*
         For this algorithm the candidates and votes are stateless, so the .db. version of the votes can be used,
@@ -17,8 +18,8 @@ public class CondorcetAlgorithm {
         The frontend can do the rest
         */
 
-        final ArrayList<String> candidates = new ArrayList<>(candidates_Arg);
-        final ArrayList<org.example.backend.model.db.Vote> votes = new ArrayList<>(votes_Args);
+        final ArrayList<String> candidates = new ArrayList<>(candidatesArg);
+        final ArrayList<org.example.backend.model.db.Vote> votes = new ArrayList<>(votesArgs);
         final int[][] duels;
 
         /* initialize the result matrix:
@@ -57,8 +58,9 @@ public class CondorcetAlgorithm {
             int index2 = candidates.indexOf(o2);
             Integer points1 = points[index1];
             Integer points2 = points[index2];
-            return -points1.compareTo(points2);
+            return points1.compareTo(points2);
         });
+        Collections.reverse(candidatesSorted);
 
         /*
         Now the list of candidates has been sorted, with the candidates with the most points first,
@@ -113,9 +115,9 @@ public class CondorcetAlgorithm {
             inc(duels, j, i); // 2 wins
     }
 
-    private static void inc(int[][] duels, int i, int j) {
-        duels[i][j]--;
-        duels[j][i]++;
+    private static void inc(int[][] duels, int a, int b) {
+        duels[a][b]--;
+        duels[b][a]++;
     }
 
     public record CondorcetResult(

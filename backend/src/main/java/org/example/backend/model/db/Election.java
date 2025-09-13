@@ -53,7 +53,7 @@ public record Election(
         return s.toString();
     }
 
-    public ArrayList<Candidate> getCandidates(List<Candidate> allCandidates) {
+    public List<Candidate> getCandidates(List<Candidate> allCandidates) {
 
         ArrayList<Candidate> runningCandidates = new ArrayList<>();
         for(String eId : this.candidateIDs()) {

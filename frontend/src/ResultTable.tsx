@@ -35,7 +35,7 @@ export default function ResultTable(props:Readonly<ResultTableProps>) {
     }
 
     function getComparisonRow(lowerU: string[] | undefined, upper: string[], lowerCount: number):JSX.Element {
-        const lower:string[] = lowerU?lowerU:[];
+        const lower:string[] = lowerU??[];
         const gain:string[] = upper.filter(id => lower.indexOf(id)<0);
         const lose:string[] = lower.filter(id => upper.indexOf(id)<0);
 
@@ -95,27 +95,27 @@ export default function ResultTable(props:Readonly<ResultTableProps>) {
         <table border={1}>
             <thead>
                 <tr><th>&nbsp;</th>
-                    {props.resultCondorcet.candidateIDs.map((candidateID, indexY) => {
+                    {props.resultCondorcet.candidateIDs.map((candidateID, indexX) => {
                         const candidateU:Candidate|undefined = props.allCandidates
                             .filter(c => c.id === candidateID)
                             .at(0);
-                        return(<th style={{backgroundColor:candidateU?("#"+candidateU.color):"#fff"}}>{indexY+1}</th>)
+                        return(<th key={"condorcet-col-" + indexX} style={{backgroundColor:candidateU?("#"+candidateU.color):"#fff"}}>{indexX+1}</th>)
                     })}
                 </tr>
             </thead>
             {props.resultCondorcet.candidateIDs.map((candidateID, indexY) => {
-                const myDuels = props.resultCondorcet.duels[indexY];
-                return(<tr><td><div style={{display:"flex",flexDirection:"row"}}><span>{(indexY+1) + ": "}</span>{getCandidateBox(candidateID)}</div></td>
+                const myDuels:number[] = props.resultCondorcet.duels[indexY];
+                return(<tr key={"condorcet-row-" + indexY}><td><div style={{display:"flex",flexDirection:"row"}}><span>{(indexY+1) + ": "}</span>{getCandidateBox(candidateID)}</div></td>
 
                     {myDuels.map((num, indexX) => {
                         if (indexX == indexY) {
-                            return (<td style={{backgroundColor: "#000"}}>&nbsp;</td>)
+                            return (<td key={"condorcet-duel-" + indexY+"-"+indexX} style={{backgroundColor: "#000"}}>&nbsp;</td>)
                         } else if (num > 0) {
-                            return (<td style={{backgroundColor: "var(--mylightgreen)"}}>{num}</td>)
+                            return (<td key={"condorcet-duel-" + indexY+"-"+indexX} style={{backgroundColor: "var(--mylightgreen)"}}>{num}</td>)
                         } else if (num < 0) {
-                            return (<td style={{backgroundColor: "var(--mylightred)"}}>{num}</td>)
+                            return (<td key={"condorcet-duel-" + indexY+"-"+indexX} style={{backgroundColor: "var(--mylightred)"}}>{num}</td>)
                         } else {
-                            return (<td>{num}</td>)
+                            return (<td key={"condorcet-duel-" + indexY+"-"+indexX}>{num}</td>)
                         }
                     })}
 
