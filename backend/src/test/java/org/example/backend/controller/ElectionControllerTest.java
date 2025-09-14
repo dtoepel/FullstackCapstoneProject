@@ -62,6 +62,23 @@ class ElectionControllerTest {
             "Person",
             1);
 
+    final Election CLOSED_ELECTION = new Election(
+            "id3",
+            "MyElection",
+            "some details",
+            Arrays.asList("A", "B", "C", "D", "E"),
+            Arrays.asList(
+                    new Vote(Arrays.asList("C", "B", "E", "A", "D")),
+                    new Vote(Arrays.asList("E", "B", "A", "D", "C")),
+                    new Vote(Arrays.asList("B", "A", "D", "C")),
+                    new Vote(Arrays.asList("D", "A", "C")),
+                    new Vote(Arrays.asList("A", "C"))),
+            Arrays.asList("voter1@example.com", "voter2@example.com"),
+            Election.ElectionState.VOTING,
+            Election.ElectionType.STV,
+            "Person",
+            1);
+
     @Test
     void getAllElections() throws Exception {
 
@@ -913,6 +930,44 @@ class ElectionControllerTest {
 
         //THEN
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    void analyseElectionSuccess() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(CLOSED_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/result-analysis/"+CLOSED_ELECTION.id()))
+
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isOk());
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/result-condorcet/"+CLOSED_ELECTION.id()))
+
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void analyseElectionFail404() throws Exception {
+        //GIVEN
+        electionRepo.deleteAll();
+        electionRepo.save(CLOSED_ELECTION);
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/result-analysis/"+OPEN_ELECTION.id()))
+
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/result-condorcet/"+OPEN_ELECTION.id()))
+
+        //THEN
+        .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
 }
