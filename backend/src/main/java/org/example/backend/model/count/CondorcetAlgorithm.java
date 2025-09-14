@@ -3,9 +3,7 @@ package org.example.backend.model.count;
 import org.example.backend.model.db.Vote;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 public class CondorcetAlgorithm {
     private CondorcetAlgorithm() {}

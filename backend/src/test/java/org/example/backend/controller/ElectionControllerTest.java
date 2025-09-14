@@ -836,6 +836,13 @@ class ElectionControllerTest {
         //THEN
                 .andExpect(MockMvcResultMatchers.status().isForbidden())
                 .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_COUNT_EMPTY_VOTES));
+
+        //WHEN
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/election/result-analysis/myID"))
+
+        //THEN
+                .andExpect(MockMvcResultMatchers.status().isForbidden())
+                .andExpect(MockMvcResultMatchers.status().reason(Election.IllegalManipulationException.MSG_CANNOT_COUNT_EMPTY_VOTES));
     }
 
     @Test
