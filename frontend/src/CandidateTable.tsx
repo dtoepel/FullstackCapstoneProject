@@ -14,9 +14,10 @@ export type CandidateTableProps = {
 export default function CandidateTable(props:Readonly<CandidateTableProps>) {
     const types:string[] = getAllCandidateTypes(props.value);
     const [typeFilter, setTypeFilter] = useState<string|null>(null);
+    const [showArchived, setShowArchived] = useState<boolean>(false);
     const [page, setPage] = useState<number>(0);
     const filteredCandidates:Candidate[] = props.value
-        .filter(candidate => {return typeFilter===null || typeFilter===candidate.type});
+        .filter(candidate => {return (typeFilter===null || typeFilter===candidate.type) && (showArchived || !candidate.archived)});
     const itemCount:number = filteredCandidates.length;
     const maxItems:number = 12;
     const maxPages:number = itemCount==0?1:Math.floor((itemCount + maxItems - 1) / maxItems);
@@ -37,15 +38,23 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
     }
 
     return(
-        <>
-            <div style={{display:"flex", flexDirection:"row", alignItems:"baseline"}}>
-                <label htmlFor="candidate-types">Filter by Type:</label>
-                <select name="candidate-types" id="candidate-types" onChange={filterChanged}>
-                    <option value={"Show All"}>Show All</option>
-                    {types.map(type => { return(
-                        <option value={type}>{type}</option>
-                    )})}
-                </select>
+        <div style={{display:"flex", flexDirection:"column", alignItems:"stretch"}}>
+            <div style={{display:"flex", flexDirection:"row", alignItems:"baseline", justifyContent:"space-evenly"}}>
+                <div style={{display:"flex", flexDirection:"row", alignItems:"baseline", justifyContent:"center"}}>
+                    <label htmlFor="candidate-types">Filter by Type:</label>
+                    <select name="candidate-types" id="candidate-types" onChange={filterChanged}>
+                        <option value={"Show All"}>Show All</option>
+                        {types.map(type => {
+                            return (
+                                <option value={type}>{type}</option>
+                            )
+                        })}
+                    </select>
+                </div>
+                <div style={{display:"flex", flexDirection:"row", alignItems:"baseline", justifyContent:"center"}}>
+                    <label>Show Archived:</label><br/>
+                    <input type="checkbox" checked={showArchived} onChange={e => setShowArchived(e.target.checked)}/>
+                </div>
                 <PageSelector page={page} setPage={setPage} maxPages={maxPages}/>
                 <button onClick={() => props.onCreateCandidate()}>Create</button>
             </div>
@@ -70,8 +79,10 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                             <td>{candidate.description}</td>
                             <td>{candidate.type}</td>
                             <td>
-                                <button onClick={() => props.onEditCandidate(candidate)}>Edit</button>
-                                <button onClick={() => props.onRetireCandidate(candidate)}>Retire</button>
+                                {candidate.archived?"":<>
+                                    <button onClick={() => props.onEditCandidate(candidate)}>Edit</button>
+                                    <button onClick={() => props.onRetireCandidate(candidate)}>Retire</button>
+                                    </>}
                                 {getDeleteButton(candidate, props.elections)}
                             </td>
                         </tr>
@@ -79,6 +90,6 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
                 })}
                 </tbody>
             </table>
-        </>
+        </div>
     )
 }
