@@ -2,6 +2,7 @@ import type {Candidate, Election} from "./ElectionData.ts";
 import CandidateBox from "./CandidateBox.tsx";
 import {useState} from "react";
 import PageSelector from "./PageSelector.tsx";
+import ElectionCard from "./ElectionCard.tsx";
 
 export type ElectionTableProps = {
     elections:Election[];
@@ -110,6 +111,21 @@ export default function ElectionTable(props:Readonly<ElectionTableProps>) {
             <div style={{display:"flex", flexDirection:"row"}}>
                 {(props.isArchive||!props.isAdmin)?"":<button onClick={() => props.onCreateElection()}>Create</button>}
                 <PageSelector page={page} setPage={setPage} maxPages={maxPages}/>
+            </div>
+            <div className={"election-table"}>
+                {electionsOnPage
+                    .map((election) => { return (<ElectionCard
+                        key={election.id}
+                        election={election}
+                        candidates={props.candidates}
+                        onEditElection={() => props.onEditElection(election)}
+                        onAdvanceElection={() => props.onAdvanceElection(election)}
+                        onGetResult={() => props.onGetResult(election)}
+                        onDeleteElection={() => props.onDeleteElection(election)}
+                        onVote={() => props.onVote(election)}
+                        isArchive={props.isArchive}
+                        isAdmin={props.isAdmin}
+                    />)}) }
             </div>
             <table border={1}>
                 <thead>

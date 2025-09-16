@@ -1,7 +1,10 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
+body {
+  background: #222;
+}
 
+#root {
+  margin: 0 auto;
+  width: 100vw;
   text-align: center;
 
   --myblue:#48f;
@@ -12,6 +15,16 @@
   --mydarkred:#a00;
   --mydarkgray:#888;
   --mylightgray:#ddd;
+  --myblack:#222;
+
+  background-color: var(--myblack);
+  color: #ddd;
+}
+
+
+
+table {
+  max-width: 900px;
 }
 
 button {
@@ -20,16 +33,27 @@ button {
   margin: 2px;
   color: #fff;
   background-color: var(--myblue);
+  &:hover {
+    background-color: var(--mygreen);
+    border-color: var(--mygreen);
+  }
 }
 
 button:disabled{
   color: var(--mydarkgray);
   background-color: var(--mylightgray);
+  border-color: var(--mylightgray);
 }
 
 button.btn-secondary{
   color: var(--myblue);
   background-color: var(--mylightgray);
+}
+
+select.page-selector {
+  font-size: 16px;
+  padding: 3px;
+  margin: 2px;
 }
 
 div.navigation-bar {
@@ -40,7 +64,7 @@ div.navigation-bar {
   flex-wrap: wrap;
   flex-basis: auto;
   align-items:baseline;
-  background-color: #000;
+  background-color: var(--myblack);
   margin: 0;
   padding: 3px;
   width: 90vw;
@@ -90,6 +114,7 @@ div.small-card-candidate{
   background-color: #535bf2;
   margin: 2px;
   padding: 1px;
+  color: black;
 }
 
 span.small-card-candidate{
@@ -148,9 +173,61 @@ div.ballot > p {
   margin: 0;
 }
 
-div.ballot-item  > p {
+div.ballot-item > p {
   margin: 0;
 }
+
+@media only screen and (min-width: 800px) {
+  div.election-table {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  div.election-table {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+div.election-table-item {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--myblue);
+  border-radius: 16px 96px 16px 16px /  16px 64px 16px 16px;
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+div.election-table-item > p {
+  margin: 0 4px 0 4px;
+  border-radius: 12px;
+}
+
+div.election-table-item > div {
+  margin: 0 4px 0 4px;
+  border-radius: 12px;
+}
+
+div.election-table-item button {
+  background-color: var(--mydarkblue);
+  &:hover {
+    background-color: var(--myblue);
+    border-color: var(--mydarkblue);
+  }
+}
+
+div.election-table-item button:disabled{
+  color: var(--mydarkgray);
+  background-color: var(--mylightgray);
+  border-color: var(--mylightgray);
+}
+
 
 .modal::backdrop {
   background: rgba(0, 0, 0, .5);

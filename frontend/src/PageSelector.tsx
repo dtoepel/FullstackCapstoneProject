@@ -30,7 +30,7 @@ export default function PageSelector(props:Readonly<PageSelectorProps>) {
         }
 
         return(
-            <select onChange={e =>
+            <select className={"page-selector"} onChange={e =>
                 props.setPage(Number.parseInt(e.target.value))}>
                 {pageNums.map(n => {
                     if(n==props.page)
