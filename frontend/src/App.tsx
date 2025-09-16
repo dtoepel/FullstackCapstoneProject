@@ -90,8 +90,8 @@ function App() {
     const [currentElection, setCurrentElection] = useState<Election|null>(null);
     const [newVote, setNewVote] = useState<Vote>(defaultVote)
     const [result, setResult] = useState<STVResultItem[]>([])
-    const [resultAnalysis, setResultAnalysis] = useState<AnalysisResult>([])
-    const [resultCondorcet, setResultCondorcet] = useState<CondorcetResult>([])
+    const [resultAnalysis, setResultAnalysis] = useState<AnalysisResult>({electedIdsBySeats:[]})
+    const [resultCondorcet, setResultCondorcet] = useState<CondorcetResult>({candidateIDs:[], duels:[]})
 
     const [confirmDeleteElection, setConfirmDeleteElection] = useState<Election|null>(null)
     const [confirmDeleteCandidate, setConfirmDeleteCandidate] = useState<Candidate|null>(null)
