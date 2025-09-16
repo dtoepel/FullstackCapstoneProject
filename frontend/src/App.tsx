@@ -8,7 +8,16 @@ import loginLogo from './assets/login.svg'
 import voteLogo from './assets/vote.svg'
 import mailLogo from './assets/email.svg'
 
-import type {Candidate, Election, MyError, STVResultItem, Vote, Voter} from "./ElectionData.ts";
+import type {
+    AnalysisResult,
+    Candidate,
+    CondorcetResult,
+    Election,
+    MyError,
+    STVResultItem,
+    Vote,
+    Voter
+} from "./ElectionData.ts";
 
 import ElectionTable from "./ElectionTable.tsx";
 import NavigationItem from "./NavigationItem.tsx";
@@ -81,6 +90,8 @@ function App() {
     const [currentElection, setCurrentElection] = useState<Election|null>(null);
     const [newVote, setNewVote] = useState<Vote>(defaultVote)
     const [result, setResult] = useState<STVResultItem[]>([])
+    const [resultAnalysis, setResultAnalysis] = useState<AnalysisResult>([])
+    const [resultCondorcet, setResultCondorcet] = useState<CondorcetResult>([])
 
     const [confirmDeleteElection, setConfirmDeleteElection] = useState<Election|null>(null)
     const [confirmDeleteCandidate, setConfirmDeleteCandidate] = useState<Candidate|null>(null)
@@ -227,8 +238,18 @@ function App() {
     function getElectionResults(election:Election):void {
         axios.get("/api/election/results/" + election.id).then(
             (response) => {
-                setResult(response.data)
-                nav("/result/")
+                setResult(response.data);
+                axios.get("/api/election/result-analysis/" + election.id).then(
+                    (response) => {
+                        setResultAnalysis(response.data);
+                        axios.get("/api/election/result-condorcet/" + election.id).then(
+                            (response) => {
+                                setResultCondorcet(response.data)
+                                nav("/result/")
+                            }
+                        )
+                    }
+                )
             }
         )
     }
@@ -397,6 +418,8 @@ function App() {
             />}/>
             <Route path={"/result/"} element={<ResultTable
             result={result}
+            resultAnalysis={resultAnalysis}
+            resultCondorcet={resultCondorcet}
             allCandidates={candidates}/>}/>
             <Route path={"/error/"} element={
                 <ErrorMessage error={error}/>}/>
