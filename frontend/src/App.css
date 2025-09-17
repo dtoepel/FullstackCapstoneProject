@@ -199,7 +199,7 @@ div.election-table-item {
   display: flex;
   flex-direction: column;
   background-color: var(--myblue);
-  border-radius: 16px 96px 16px 16px /  16px 64px 16px 16px;
+  border-radius: 16px 96px 16px 16px / 16px 64px 16px 16px;
   flex-grow: 1;
   flex-basis: 0;
 }
@@ -228,6 +228,41 @@ div.election-table-item button:disabled{
   border-color: var(--mylightgray);
 }
 
+
+@media only screen and (min-width: 800px) {
+  div.candidate-table {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+  }
+}
+
+@media only screen and (max-width: 800px) {
+  div.candidate-table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+div.candidate-table-item {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--mylightgray);
+  border-radius: 16px 96px 16px 16px / 16px 64px 16px 16px;
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+div.candidate-table-item > p {
+   margin: 0 4px 0 4px;
+   border-radius: 12px;
+ }
+
+div.candidate-table-item > div {
+  margin: 0 4px 0 4px;
+  border-radius: 12px;
+}
 
 .modal::backdrop {
   background: rgba(0, 0, 0, .5);

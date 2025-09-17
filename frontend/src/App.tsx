@@ -354,7 +354,7 @@ function App() {
                 isAdmin={!!user}
             />}/>
             <Route path={"/candidates/"} element={<CandidateTable
-                value={candidates}
+                candidates={candidates}
                 elections={elections}
                 onCreateCandidate={() => {
                     setEditCandidateProps({
