@@ -54,6 +54,7 @@ export default function CandidateTable(props:Readonly<CandidateTableProps>) {
             <div className={"candidate-table"}>
                 {candidatesOnPage.map((candidate:Candidate) => {
                     return (<CandidateCard
+                        key={candidate.id}
                         candidate={candidate}
                         elections={props.elections}
                         onEditCandidate={() => props.onEditCandidate(candidate)}
