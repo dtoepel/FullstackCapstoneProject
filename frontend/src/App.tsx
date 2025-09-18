@@ -201,9 +201,6 @@ function App() {
         const status:number|undefined = error.status;
         const message:string = error.message;
 
-        console.log("Handling Error: " );
-        console.log(error);
-
         if(error.response) {
             const message2:string = (error.response.data as never)["message"]
             setError({status:status, message:message, message2:message2})
@@ -357,7 +354,7 @@ function App() {
                 isAdmin={!!user}
             />}/>
             <Route path={"/candidates/"} element={<CandidateTable
-                value={candidates}
+                candidates={candidates}
                 elections={elections}
                 onCreateCandidate={() => {
                     setEditCandidateProps({
